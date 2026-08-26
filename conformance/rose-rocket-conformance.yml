@@ -1,0 +1,223 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  openapi/rose-rocket-platform-model-api.json,
+  https://a.roserocket.com/.well-known/openid-configuration (HTTP 200, probed
+  2026-08-26), https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide,
+  https://roserocket.readme.io/docs/object-descriptions-and-operations,
+  https://roserocket.readme.io/docs/commodities,
+  https://roserocket.readme.io/docs/partners,
+  https://www.roserocket.com/solutions/security (HTTP 200, probed 2026-08-26).
+description: >-
+  What the Rose Rocket contract and its authorization server actually conform to.
+  The OAuth 2.0 / OIDC layer is the strong part — a full, live discovery document
+  with PKCE, refresh tokens and client-credentials, all of it standards-shaped
+  because it is an Auth0 tenant. The API layer conforms to almost nothing
+  cross-cutting: no RFC 9457, no consistent pagination, no idempotency key, no
+  standard rate-limit headers. The interesting finding is at the DOMAIN level: the
+  object reference declares real freight-industry classification codes — NMFC and
+  freight class, UN/DOT hazmat classification, and government carrier identifiers —
+  which means a shipper or broker already speaking those standards can map into the
+  Rose Rocket object model without a bespoke vocabulary. Those fields live in the
+  prose object reference, not in the machine-readable spec, because the spec models
+  every record as a free-form json bag.
+standards:
+  - id: oauth2
+    name: OAuth 2.0 (RFC 6749)
+    conforms: true
+    evidence: >-
+      Authorization code and client-credentials grants documented end to end, against
+      https://a.roserocket.com/oauth/token. grant_types_supported in the live discovery
+      document includes authorization_code, client_credentials and refresh_token.
+    source: https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide
+  - id: oidc
+    name: OpenID Connect Discovery 1.0
+    conforms: true
+    evidence: >-
+      https://a.roserocket.com/.well-known/openid-configuration returns 200 with issuer,
+      authorization_endpoint, token_endpoint, userinfo_endpoint, jwks_uri,
+      end_session_endpoint, registration_endpoint and the full scopes/claims lists.
+      Saved verbatim at well-known/rose-rocket-openid-configuration.json.
+  - id: rfc8414
+    name: OAuth 2.0 Authorization Server Metadata (RFC 8414)
+    conforms: true
+    evidence: >-
+      /.well-known/oauth-authorization-server also returns 200 and is byte-identical to
+      the OIDC document.
+  - id: rfc7636
+    name: PKCE (RFC 7636)
+    conforms: true
+    evidence: code_challenge_methods_supported = [S256, plain] in the discovery document.
+  - id: rfc7009
+    name: OAuth 2.0 Token Revocation (RFC 7009)
+    conforms: true
+    evidence: revocation_endpoint = https://a.roserocket.com/oauth/revoke.
+  - id: rfc7591
+    name: OAuth 2.0 Dynamic Client Registration (RFC 7591)
+    conforms: partial
+    evidence: >-
+      registration_endpoint = https://a.roserocket.com/oidc/register is advertised by the
+      Auth0 tenant. Rose Rocket's own docs say credentials are provisioned by an account
+      representative or the Partnership team, so the advertised endpoint is a platform
+      default rather than a supported onboarding path. Not probed.
+  - id: rfc8628
+    name: OAuth 2.0 Device Authorization Grant (RFC 8628)
+    conforms: true
+    evidence: device_authorization_endpoint = https://a.roserocket.com/oauth/device/code.
+    note: Advertised by the authorization server; not referenced by Rose Rocket's own docs.
+  - id: openapi
+    name: OpenAPI 3.0.0
+    conforms: true
+    evidence: >-
+      openapi/rose-rocket-platform-model-api.json declares openapi 3.0.0, 12 paths and 19
+      operations, and parses. Quality caveats are recorded in the overlay: no
+      securitySchemes, no info.description, no tags[] declarations, no error responses on
+      14 of 19 operations, and only 4 operations carry an operationId.
+  - id: rfc9457
+    name: Problem Details for HTTP APIs (RFC 9457)
+    conforms: false
+    evidence: >-
+      The error envelope is {statusCode, message, error} served as application/json. No
+      problem+json media type, no type URI, no instance. See
+      errors/rose-rocket-problem-types.yml.
+  - id: idempotency
+    name: Idempotency keys (draft-ietf-httpapi-idempotency-key-header)
+    conforms: false
+    evidence: >-
+      No Idempotency-Key header anywhere in the spec or docs. Retry safety is achieved
+      instead through natural-key upsert on externalId (PATCH /objects), which the
+      provider documents explicitly as duplicate prevention. See
+      conventions/rose-rocket-conventions.yml.
+  - id: pagination
+    name: Consistent pagination
+    conforms: false
+    evidence: >-
+      GET /events supports limit/offset/bookmark; POST /objects/search supports limit and
+      nothing else; the remaining list operations publish no pagination at all.
+  - id: rfc8594
+    name: Sunset header / deprecation signalling (RFC 8594)
+    conforms: false
+    evidence: No Sunset or Deprecation header, and no deprecation policy. See lifecycle/rose-rocket-lifecycle.yml.
+  - id: rfc9116
+    name: security.txt (RFC 9116)
+    conforms: false
+    evidence: >-
+      /.well-known/security.txt returns 404 on every Rose Rocket host probed 2026-08-26.
+      A responsible-disclosure policy DOES exist, as an HTML page at
+      https://www.roserocket.com/responsible-disclosure (200) — it is simply not machine
+      readable. See security/rose-rocket-vulnerability-disclosure.yml.
+  - id: asyncapi
+    name: AsyncAPI
+    conforms: false
+    evidence: >-
+      A real webhook surface exists and is documented in prose, but no AsyncAPI document
+      is published. See asyncapi/rose-rocket-webhooks.yml.
+  - id: mcp
+    name: Model Context Protocol
+    conforms: false
+    evidence: >-
+      No MCP endpoint on any host probed 2026-08-26 (mcp.roserocket.com/mcp,
+      network.roserocket.com/mcp, roserocket.com/mcp, api.roserocket.com/mcp — all 404),
+      and no MCP package in the first-party npm scope. The product's AI agents (TED,
+      Rosie, Rocky) are in-product only.
+  - id: a2a
+    name: A2A Agent Card
+    conforms: false
+    evidence: >-
+      /.well-known/agent-card.json and /.well-known/agent.json return 404 on all six
+      hosts probed 2026-08-26. See well-known/rose-rocket-well-known.yml.
+  - id: graphql
+    name: GraphQL
+    conforms: false
+    evidence: /graphql returns 404 on network.roserocket.com and roserocket.com (probed 2026-08-26).
+  - id: soap-wsdl
+    name: SOAP / WSDL
+    conforms: false
+    evidence: '?wsdl on the API base returns 404 (probed 2026-08-26). No SOAP surface is documented.'
+domain_standards:
+  note: >-
+    Reward-only dimension. Recorded because the identifiers below are genuine
+    industry-standard classification schemes declared as first-class fields on Rose
+    Rocket's own objects, not because a marketing page claims a standard. The evidence
+    is the object reference rather than the OpenAPI, because the OpenAPI carries no
+    domain schema at all — every record is JSONRecord {id, objectKey} plus a free-form
+    json bag.
+  market: Freight / trucking / transportation management (North America)
+  regime_in_scoring_yml: none
+  regime_note: >-
+    scoring.yml carries no transportation regulatory regime, so there is no shortlist to
+    probe against. These were found by reading the object reference.
+  entries:
+    - id: nmfc
+      name: National Motor Freight Classification (NMFTA)
+      conforms: true
+      declared_as: commodity.nmfc
+      evidence: >-
+        "Specifies the NMFC (National Motor Freight Classification) code for the
+        commodity." — https://roserocket.readme.io/docs/commodities
+      why_it_matters: >-
+        An LTL shipper or broker already keying NMFC codes maps straight onto the field;
+        no bespoke translation layer is needed for classification or rating.
+    - id: freight-class
+      name: NMFTA freight class
+      conforms: true
+      declared_as: commodity.freightClass
+      evidence: https://roserocket.readme.io/docs/commodities
+    - id: un-dot-hazmat
+      name: UN/DOT hazardous materials classification (49 CFR / UN Model Regulations)
+      conforms: true
+      declared_as: [commodity.hazmatClass, commodity.unNumber, commodity.packingGroupNumber]
+      evidence: >-
+        "Specifies the hazardous material classification (hazmat) of the commodity", plus
+        unNumber and packingGroupNumber fields —
+        https://roserocket.readme.io/docs/commodities
+      why_it_matters: >-
+        UN number, hazard class and packing group are the three fields a compliant
+        dangerous-goods shipping paper requires. Their presence as discrete fields means
+        hazmat data survives the API rather than living in a notes blob.
+    - id: fmcsa-carrier-identifiers
+      name: FMCSA carrier identifiers (USDOT / MC)
+      conforms: true
+      declared_as: [partner.dotId, partner compliance identifiers (MCDID, DOT)]
+      evidence: >-
+        "Government-issued compliance identifiers, MCDID and DOT" on the partner object —
+        https://roserocket.readme.io/docs/partners
+    - id: edi-x12
+      name: EDI X12 transportation transaction sets (204/210/214/990)
+      conforms: false
+      evidence: >-
+        No X12 transaction set, ISA/GS envelope or EDI message type appears in the
+        contract or in any published documentation page. SPS Commerce appears in the
+        marketing integrations list, which is an integration partner, not a declared
+        conformance. Recorded as a genuine absence, not a penalty.
+compliance:
+  note: >-
+    Certification claims Rose Rocket publishes about itself. There is no trust centre
+    portal and no downloadable report; the claim below is prose on a product page.
+  certifications:
+    - name: SOC 2
+      claimed: true
+      type: not stated
+      status: '"SOC 2 audited"'
+      evidence: >-
+        "Roserocket is SOC 2 audited, so the controls protecting your data are
+        independently tested rather than simply described in a sales deck." —
+        https://www.roserocket.com/solutions/security (HTTP 200, probed 2026-08-26)
+      verification: >-
+        No report, auditor, period or Type (I/II) is named, and no trust centre or
+        request-a-report flow is published. trust.roserocket.com resolves but returns the
+        Rose Rocket application shell, not a trust centre.
+  other_programs:
+    sso_saml:
+      available: true
+      tier: Enterprise
+      evidence: '"Advanced security (SSO, SAML)" listed under the Enterprise tier — https://www.roserocket.com/pricing'
+    audit_trail:
+      available: true
+      evidence: >-
+        "Every field edit on every record is captured automatically" —
+        https://www.roserocket.com/solutions/security. Product feature; no API surface for
+        reading the audit trail is documented.
+    rbac:
+      available: true
+      evidence: https://roserocket.readme.io/docs/roles-and-permissions — see scopes/rose-rocket-scopes.yml.

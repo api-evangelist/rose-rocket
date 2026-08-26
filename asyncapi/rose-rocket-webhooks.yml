@@ -1,0 +1,140 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://roserocket.readme.io/docs/webhooks-2 (HTTP 200, fetched 2026-08-26 as
+  markdown), cross-checked against
+  https://roserocket.readme.io/docs/object-descriptions-and-operations and
+  openapi/rose-rocket-platform-model-api.json.
+type: Webhooks
+asyncapi_published: false
+asyncapi_note: >-
+  No AsyncAPI document exists. Probed 2026-08-26 (all 404):
+  network.roserocket.com/asyncapi.yaml, network.roserocket.com/asyncapi.json,
+  network.roserocket.com/api/v2/platformModel/asyncapi.json and
+  roserocket.readme.io/asyncapi.yaml. The docs index (llms.txt) lists no event catalog
+  page beyond the single Webhooks guide, and the GitHub organization has no public
+  repositories. This artifact captures the webhook catalog as documented; it
+  is NOT an AsyncAPI document and nothing here was authored on the provider's behalf.
+description: >-
+  Rose Rocket ships a real but deliberately minimal webhook surface. Exactly ONE
+  event is documented — Order Status Changed — and the provider says so plainly:
+  "the webhook functionality is currently limited in terms of supported events and
+  custom event definitions". The delivery contract is unusually well specified for a
+  provider this size (a fixed payload envelope, a stated retry policy, an explicit
+  at-least-once guarantee, and 7 days of receipts in the UI), and unusually weak on
+  security: there is no signature, no shared secret and, in the provider's own words,
+  no way to supply credentials for the callback at all.
+subscription:
+  model: >-
+    Webhook destinations and subscriptions are ORDINARY RECORDS. They are created
+    through the same POST /objects endpoint as a customer or an order, using
+    objectKey "webhookDestination" with a nested subscriptions[] array of
+    "webhookSubscription" records. There is no dedicated webhook API.
+  endpoint: POST https://network.roserocket.com/api/v2/platformModel/objects
+  ui: Profile > Settings > API Settings > Webhooks (https://network.roserocket.com/_/#/ops/settings/webhooks)
+  objects:
+    - objectKey: webhookDestination
+      fields:
+        - {name: name, type: string, required: true, description: Name for the destination.}
+        - {name: url, type: string, required: true, description: URL Rose Rocket POSTs the payload to.}
+        - {name: subscriptions, type: array, required: true, description: webhookSubscription records.}
+    - objectKey: webhookSubscription
+      fields:
+        - {name: objectKey, type: string, required: true, description: Literal "webhookSubscription".}
+        - {name: eventName, type: string, required: true, description: 'Name of the event to trigger on, e.g. "Order Status Changed".'}
+  example_payload: |
+    {
+      "objectKey": "webhookDestination",
+      "json": {
+        "name": "Test to XYZ Freight",
+        "url": "https://hooks.example.com/hooks/catch/…",
+        "subscriptions": [
+          { "objectKey": "webhookSubscription", "eventName": "Order Status Changed" }
+        ]
+      }
+    }
+delivery:
+  transport: HTTP POST
+  content_type: application/json
+  envelope:
+    fields:
+      - {name: id, type: string, required: true, description: Unique identifier of the webhook event.}
+      - {name: type, type: string, required: true, description: Type of the webhook event.}
+      - {name: refId, type: string, required: true, description: Reference identifier associated with the event.}
+      - {name: ownerId, type: string, required: true, description: User or account that triggered the event.}
+      - {name: orgId, type: string, required: true, description: Organization the event belongs to.}
+      - {name: createdAt, type: string (UTC date-time), required: true, description: When the event occurred.}
+      - {name: objectKey, type: string, required: true, description: Key identifying the object the event relates to.}
+      - {name: json, type: object, required: false, description: Event-specific payload. Contents vary by event.}
+    note: The seven required attributes are identical across every event; only `json` varies.
+  guarantee: at-least-once
+  retries:
+    attempts: 3
+    delay_seconds: 30
+    trigger: any failure code returned by the subscriber
+    note: >-
+      "If all retries fail, delivery is not guaranteed." There is no dead-letter queue
+      and no replay endpoint — a permanently failed delivery is lost to the API, though
+      it remains visible in the UI receipts for 7 days.
+  ordering: not documented
+  timeout: not documented
+events:
+  count: 1
+  note: >-
+    "The events available for webhooks can vary depending on the modules or features
+    you have enabled." Only one default event is named in the documentation; an
+    organization may see more depending on its enabled modules, but no catalog of those
+    is published.
+  catalog:
+    - name: Order Status Changed
+      eventName: Order Status Changed
+      object: order
+      trigger: The status of an order changes.
+      payload: Common envelope; `json` carries event-specific order data whose shape is not documented.
+      documented: true
+security:
+  signature: none
+  signature_note: >-
+    No HMAC signature header, no shared secret, no timestamp and no replay protection is
+    documented. A receiver cannot verify that a delivery came from Rose Rocket.
+  authentication_to_subscriber: none
+  authentication_note: >-
+    Stated as a limitation by the provider: "you can only specify a Webhook URL when
+    registering subscriptions. The functionality to generate or input a ClientID and
+    Client Secret for Basic Auth is not yet available."
+  mtls: false
+  ip_allowlist: not documented
+  recommendation: >-
+    A subscriber has no cryptographic way to authenticate a delivery. The only practical
+    mitigations are an unguessable callback path and re-fetching the referenced record
+    through GET /objects/{refId} before acting on it.
+subscriber_response_codes:
+  note: The codes Rose Rocket documents as meaningful when returned BY the subscriber.
+  codes:
+    - {code: 400, meaning: Invalid request parameter being sent.}
+    - {code: 401, meaning: The user is not authorized to access the resource, or the authentication token has expired.}
+    - {code: 404, meaning: No object found with the provided ID.}
+    - {code: 500, meaning: The request cannot be processed.}
+observability:
+  receipts: >-
+    Webhook Receipts in the UI hold 7 days of successful and failed deliveries,
+    filterable by Event Type, Event ID, Retries, Status and Response, including the error
+    body returned by the subscriber.
+  api_access: none — receipts are UI only. No endpoint exposes delivery history.
+related_polling_surface:
+  note: >-
+    The nearest API-side alternative to webhooks. GET /events returns activity on a
+    record and is the only paginated collection in the contract.
+  operation: GET /events
+  params: [recordId, objectKey, boardId, type, inTypes, notInTypes, userId, orderBy, orderByDirection, limit, offset, bookmark]
+  event_types: [create, mutate, internal, widget-open, widget-close]
+  constraint: >-
+    recordId and objectKey are both REQUIRED, so this is a per-record feed. There is no
+    org-wide or since-timestamp event stream to poll, which means it cannot substitute
+    for a missed webhook without knowing which record to ask about.
+gaps:
+  - One documented event. No order-created, no task, stop, manifest, invoice or bill events.
+  - No AsyncAPI or other machine-readable event contract.
+  - No signature or secret on deliveries.
+  - No replay or dead-letter surface; receipts are UI-only and expire after 7 days.
+  - The `json` payload of the one documented event has no published schema.

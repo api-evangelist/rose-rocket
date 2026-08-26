@@ -1,0 +1,129 @@
+generated: '2026-08-26'
+method: derived
+source: >-
+  Derived from the 4xx responses and components.responses block of
+  openapi/rose-rocket-platform-model-api.json, enriched from the error tables in
+  https://roserocket.readme.io/docs/object-descriptions-and-operations,
+  https://roserocket.readme.io/docs/webhooks-2,
+  https://roserocket.readme.io/docs/upserts-and-external-ids and
+  https://roserocket.readme.io/docs/roles-and-permissions (all fetched 2026-08-26,
+  HTTP 200).
+description: >-
+  Rose Rocket returns a single, consistent error envelope across the Platform Model
+  API — statusCode, message, error — and nothing more. It is NOT RFC 9457
+  problem+json: there is no type URI, no per-error code vocabulary, no instance
+  pointer and no field-level detail beyond a validation message array. Every error a
+  client can distinguish, it distinguishes by HTTP status alone, which means the three
+  documented causes of a 403 are indistinguishable to a caller at runtime. Note also
+  that the 4xx responses are declared ONLY on the five user-group operations; the
+  fourteen object-record operations declare a 200/201/204 and nothing else, so a
+  client generated from the spec has no failure branch for the endpoints that do the
+  actual work.
+format: custom
+rfc9457: false
+media_type: application/json
+envelope:
+  fields:
+    statusCode:
+      type: number
+      required: true
+      description: Repeats the HTTP status code in the body.
+    message:
+      type: string | string[]
+      required: true
+      description: >-
+        Human-readable. A plain string for most errors; an ARRAY of validation strings
+        for 400 responses (e.g. ["name should not be empty"]). Clients must handle both.
+    error:
+      type: string
+      required: true
+      description: The HTTP reason phrase, e.g. "Not Found", "Unauthorized", "Forbidden", "Conflict".
+  example: '{"statusCode": 404, "message": "User group with ID \"XXXXX\" not found.", "error": "Not Found"}'
+problem_types:
+  - status: 400
+    name: Validation error
+    spec_component: GroupValidationError
+    title: Request body failed validation.
+    message_shape: array of strings
+    example_message: name should not be empty
+    remediation: Read every string in the message array; each names one failed field constraint.
+    operations: [POST /userGroups]
+    also_documented_for: All object CRUD operations, per the docs error table ("Invalid request parameter being sent").
+  - status: 401
+    name: Unauthorized
+    spec_component: GroupUnauthorized
+    title: >-
+      The call was not made with a valid JWT identifying the calling user or
+      application, or the token has expired.
+    example_message: Action is unauthorized.
+    remediation: >-
+      Refresh the access token (grant_type=refresh_token at
+      https://a.roserocket.com/oauth/token) and retry once. The Authentication Guide
+      names 401 as the designated expiry signal and warns that session lifetime is
+      deliberately variable, so a long-running agent should treat a single 401 as
+      routine rather than fatal.
+    operations: [all]
+  - status: 403
+    name: Forbidden
+    spec_component: GroupForbiddenResponse
+    title: The caller's role does not carry sufficient permission for this action.
+    example_message: Action is forbidden.
+    remediation: >-
+      Not retryable. The fix is an administrative permission change, not a different
+      request. For user-group operations the spec names the required permission:
+      viewer level on userGroupResource to list/fetch/view membership, editor level to
+      update/delete/modify membership.
+    documented_causes:
+      - Role lacks viewer or editor permission on the object.
+      - Restricted access for editing a field.
+      - Widgets not allowed for role.
+    indistinguishable: >-
+      All causes return the same body. A caller cannot tell a missing object permission
+      from a per-field restriction.
+    operations: [all]
+  - status: 404
+    name: Not found
+    spec_component: GroupNotFound
+    title: No object found with the provided ID.
+    example_message: User group with ID "XXXXX" not found.
+    remediation: >-
+      Verify the id. Note that a 404 is also the correct successful outcome of a
+      repeated DELETE, and that a record the caller's role cannot see may be reported
+      as absent rather than forbidden.
+    operations:
+      - 'GET /objects/{recordId}'
+      - 'PUT /objects/{recordId}'
+      - 'DELETE /objects/{recordId}'
+      - 'GET /userGroups/{groupId}/members'
+      - 'POST /userGroups/{groupId}/members'
+  - status: 409
+    name: Conflict
+    spec_component: GroupNameConflict
+    title: A group already exists with the name provided.
+    example_message: Group name is already in use.
+    remediation: Choose a different group name, or search for the existing group first (POST /userGroups/search).
+    operations: [POST /userGroups]
+  - status: 500
+    name: Internal server error
+    spec_component: none
+    title: The request cannot be processed.
+    example_message: Internal server error
+    remediation: >-
+      Retryable with backoff. Note the Upserts guide's warning that a 500 on an upsert
+      "is not specific to duplicate external IDs" — do not infer a duplicate from a 500.
+    operations: [all]
+    in_spec: false
+webhook_delivery_errors:
+  note: >-
+    Distinct surface: these are the codes Rose Rocket expects to RECEIVE from a
+    subscriber's endpoint, documented in the Webhooks guide. See
+    asyncapi/rose-rocket-webhooks.yml.
+  codes: [400, 401, 404, 500]
+  provider_behaviour: >-
+    On any failure code Rose Rocket retries up to 3 times with a 30-second delay.
+    Delivery is at-least-once and is not guaranteed if all retries fail.
+gaps:
+  - No error code vocabulary. Nothing distinguishes two errors that share a status.
+  - No RFC 9457 type/instance/detail fields, and no application/problem+json media type.
+  - 'The fourteen /objects operations declare no error responses at all in the spec: a generated client sees only success.'
+  - No 429 is documented anywhere, in the spec or the docs, despite the API being a per-organization multi-tenant surface.

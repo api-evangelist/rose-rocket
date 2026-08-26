@@ -1,0 +1,41 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://registry.npmjs.org/@roserocket-sdk%2frock-cli — package metadata read
+  2026-08-26. Description verbatim from the registry: "Rock is Rose Rocket's
+  External developer CLI."
+description: >-
+  Rose Rocket publishes a first-party external developer CLI called `rock`,
+  distributed on npm under the @roserocket-sdk scope. It is REAL and it is
+  current (1.2.16, published 2026-06-29), but its command surface is NOT
+  published anywhere a developer or an agent can read without installing it:
+  the npm README is empty, the repository it points at
+  (github.com/RoseRocketSDK/roserocket-sdk) is private, and neither
+  roserocket.readme.io nor help.roserocket.com documents the CLI. This artifact
+  therefore records the tool's existence, install path and binary names
+  faithfully and stops there. NO COMMAND LIST IS RECORDED because none is
+  published — inventing one would be fabrication.
+name: rock
+binary: rock
+install:
+  npm: npm install -g @roserocket-sdk/rock-cli
+packages:
+  - name: '@roserocket-sdk/rock-cli'
+    version: 1.2.16
+    published: '2026-06-29'
+    binary: rock
+    url: https://www.npmjs.com/package/@roserocket-sdk/rock-cli
+  - name: '@roserocket-sdk/rock-cli-core'
+    version: 1.9.0
+    published: '2026-06-29'
+    binary: rock-core
+    url: https://www.npmjs.com/package/@roserocket-sdk/rock-cli-core
+repo: https://github.com/RoseRocketSDK/roserocket-sdk
+repo_public: false
+commands: []
+commands_documented: false
+commands_note: >-
+  Not published. Probed 2026-08-26: registry.npmjs.org readme field empty for both
+  packages; github.com/RoseRocketSDK reports 0 public repositories; no CLI page in
+  https://roserocket.readme.io/llms.txt (which enumerates every published doc page).
+docs: null

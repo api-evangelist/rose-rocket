@@ -1,0 +1,85 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide,
+  https://roserocket.readme.io/docs/roles-and-permissions, the
+  components.responses.GroupForbiddenResponse description inside
+  openapi/rose-rocket-platform-model-api.json, and the live discovery document at
+  https://a.roserocket.com/.well-known/openid-configuration (HTTP 200, probed
+  2026-08-26).
+docs: https://roserocket.readme.io/docs/roles-and-permissions
+description: >-
+  Rose Rocket's OAuth 2.0 layer carries NO API authorization scopes. The scopes the
+  Authentication Guide tells you to request — `offline_access email profile` — are
+  the standard OIDC identity scopes of the Auth0 authorization server at
+  a.roserocket.com; none of them names a Rose Rocket resource or a permission on
+  one. Authorization is enforced entirely server-side by the ROLE the token's user
+  or service account holds inside the organization, against a per-object,
+  per-field permission matrix administered in the product. This is a real and
+  reasonably granular authorization model, but it is invisible to a client: an
+  agent holding a token cannot read from the token, or from any documented scope
+  list, what it is allowed to do. It finds out by receiving a 403.
+model: role-based
+model_note: >-
+  Permissions are set per ROLE per objectKey, in three sections — Board (which
+  boards the role sees), Record (isCreateAllowed / isDeleteAllowed) and Data (full,
+  read-only, or per-field custom). They are administered at
+  Settings > Users, Roles, Groups > Roles, and can be written through
+  POST {base}/permissions/roles/{role}/objectKey/{object} — an endpoint documented
+  in the Roles and Permissions guide that is NOT present in the published OpenAPI.
+authorization_server: https://a.roserocket.com/
+audience: https://roserocket.com
+oauth_scopes_requested:
+  - name: offline_access
+    purpose: Issues a refresh token. Required for any long-lived integration.
+    kind: oidc
+  - name: email
+    purpose: Adds the email claim to the ID token. Identity only; grants no API access.
+    kind: oidc
+  - name: profile
+    purpose: Adds profile claims to the ID token. Identity only; grants no API access.
+    kind: oidc
+oauth_scopes_supported_by_authorization_server:
+  source: https://a.roserocket.com/.well-known/openid-configuration
+  note: >-
+    Advertised by the Auth0 tenant, not by Rose Rocket. Every entry is an OIDC
+    identity scope or claim; none is a Rose Rocket resource permission.
+  values: [openid, profile, offline_access, name, given_name, family_name, nickname,
+    email, email_verified, picture, created_at, identities, phone, address]
+resource_permissions_note: >-
+  The one named permission the published contract exposes. It appears only in the
+  403 response description for the user-group operations, and it uses a
+  viewer/editor level rather than an OAuth scope string.
+resource_permissions:
+  - name: userGroupResource
+    levels:
+      viewer: List, fetch, and view membership of user groups.
+      editor: Update, delete, and modify membership of user groups.
+    applies_to:
+      - GET /userGroups
+      - POST /userGroups
+      - GET /userGroups/{groupId}/members
+      - POST /userGroups/{groupId}/members
+      - POST /userGroups/search
+    evidence: components.responses.GroupForbiddenResponse.description
+built_in_roles_source: https://roserocket.readme.io/docs/roles-and-permissions
+built_in_roles:
+  - {name: Admin, description: Full access for account owners and system administrators.}
+  - {name: Manager, description: 'Almost full access, restricted from changing organizational or subscription settings. Service accounts default to this role.'}
+  - {name: Operations, description: Limited financial data access.}
+  - {name: Sales, description: Limited financial data access.}
+  - {name: Driver, description: Specific for company driver or owner operator.}
+  - {name: Customer (Guest), description: Limited access for your customers.}
+  - {name: Partner (Guest), description: Limited access to tracking and providing updates.}
+  - {name: Guest, description: Provides guests with limited access.}
+  - {name: External, description: For public viewing of shared information.}
+  - {name: Custom, description: Organizations can define additional roles; every built-in role is editable by an Admin.}
+scope_count: 0
+scope_count_note: >-
+  Zero API authorization scopes are published. Counted deliberately: the three OIDC
+  scopes above are identity scopes and are recorded separately so they are not
+  mistaken for resource permissions.
+gaps:
+  - The OpenAPI declares no components.securitySchemes at all, so no scope list is machine-readable.
+  - No token introspection surface is documented, so a client cannot enumerate its own effective permissions.
+  - The permissions write endpoint (POST /permissions/roles/{role}/objectKey/{object}) is documented in prose but absent from the contract.

@@ -1,0 +1,282 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  The Rose Rocket object reference pages, each fetched 2026-08-26 as markdown (HTTP
+  200) via the .md rendering the provider's own llms.txt advertises:
+  /docs/order, /docs/customer, /docs/task, /docs/stop-2, /docs/manifest-1,
+  /docs/commodities, /docs/partners, /docs/quotes, /docs/invoices, /docs/bills,
+  /docs/financial-line-items, /docs/contacts, /docs/address, /docs/assets,
+  /docs/tags, /docs/documents, /docs/document, /docs/pay-stubs, /docs/tax-rule,
+  /docs/tax-rate-and-tax-rate-components, /docs/gl-account,
+  /docs/fuel-zones-and-tariffs, /docs/object-descriptions-and-operations — all under
+  https://roserocket.readme.io. Structural facts cross-checked against
+  openapi/rose-rocket-platform-model-api.json.
+description: >-
+  The entity graph of the Rose Rocket Platform Model API. It could not be derived
+  from the OpenAPI: the spec models every record as JSONRecord { id, objectKey } with
+  a free-form `json` bag and declares eleven request/response wrappers, no domain
+  entities and no $ref links between them. The graph below is read from the object
+  reference, where Rose Rocket names each object's key and each relationship as a
+  "connected object". This is the single largest machine-readability gap in the
+  provider's surface: the relationships are real, documented and stable, and none of
+  them are in the contract, so no generated client and no agent can discover them.
+access_pattern:
+  note: >-
+    Every entity is reached through the same operations. There is no per-entity path.
+  read: GET /objects/{recordId}  (or GET /objects/{objectKey}/{externalId}/external)
+  expand: '?paths=<connected object>,<connected object> — connected objects are omitted by default'
+  search: POST /objects/search with {boardId, filters, filtersOperator, orderByPath, orderByDirection, limit}
+  write: 'POST /objects | PUT /objects/{recordId} | PATCH /objects (upsert by externalId) | DELETE /objects/{recordId} | POST /objects/bulk_delete'
+  selector: The objectKey value in the payload or path selects the entity type.
+common_fields:
+  note: All records extend a common base, observed identically across every object page and in the Getting Started response sample.
+  fields:
+    - {name: id, type: string (uuid), description: Globally unique record identifier.}
+    - {name: objectKey, type: string, description: The entity type. Determines which schema the record follows.}
+    - {name: orgId, type: string (uuid), description: Owning organization. The tenancy boundary.}
+    - {name: fullId, type: string, description: 'Human-readable per-org sequence, e.g. CUST-9, O-19, M-O-19.'}
+    - {name: externalId, type: string | null, description: Caller-owned identifier. The upsert key. Nullable.}
+    - {name: source, type: string, description: 'How the record was created, e.g. "manual".'}
+    - {name: status, type: string (enumerated), description: Present on most operational objects.}
+    - {name: createdAt, type: string (date-time), description: UTC.}
+    - {name: createdBy, type: string (uuid), description: User id.}
+    - {name: updatedAt, type: string (date-time), description: UTC.}
+    - {name: updatedBy, type: string (uuid), description: User id.}
+    - {name: version, type: number, description: Increments on every update. No documented optimistic-concurrency header uses it.}
+    - {name: widgets, type: array, description: 'In-product UI extension points on this record: {key, name, version}. See components/rose-rocket-components.yml.'}
+    - {name: widgetToOpen, type: object, description: Pointer to the widget the UI should open for this record.}
+entities:
+  - name: Order
+    objectKey: order
+    domain: operations
+    description: A revenue-generating agreement. The container for the work to be done and its progress.
+    docs: https://roserocket.readme.io/docs/order
+  - name: Task
+    objectKey: task
+    domain: operations
+    description: A unit of work on an order. Statuses new, incomplete, inprogress, assigned, complete, problem, canceled.
+    docs: https://roserocket.readme.io/docs/task
+  - name: Stop
+    objectKey: stop
+    domain: operations
+    description: A location at which tasks are performed. Carries pickup and delivery tasks and proof documents.
+    docs: https://roserocket.readme.io/docs/stop-2
+  - name: Manifest
+    objectKey: manifest
+    domain: operations
+    description: 'A dispatched grouping of tasks. Auto-named from the order it covers, e.g. M-O-19.'
+    docs: https://roserocket.readme.io/docs/manifest-1
+  - name: Commodity
+    objectKey: commodity
+    domain: operations
+    description: 'The freight itself. Carries the industry classification fields: nmfc, freightClass, hazmatClass, unNumber, packingGroupNumber.'
+    docs: https://roserocket.readme.io/docs/commodities
+  - name: Customer
+    objectKey: customer
+    domain: crm
+    description: 'The party being billed. customerType is one of Shipper, Broker, Receiver, Other.'
+    docs: https://roserocket.readme.io/docs/customer
+  - name: Partner
+    objectKey: partner
+    domain: crm
+    description: The carrier or vendor side. Holds compliance identifiers (MCDID, DOT), lanes and asset types.
+    docs: https://roserocket.readme.io/docs/partners
+  - name: Contact
+    objectKey: contact
+    domain: crm
+    description: A person at a customer or partner. Explicitly NOT shared across modules — a contact belongs to one parent.
+    docs: https://roserocket.readme.io/docs/contacts
+  - name: Address
+    objectKey: address
+    domain: reference
+    description: A location. Carries a Google Place ID alongside the postal fields.
+    docs: https://roserocket.readme.io/docs/address
+  - name: Quote
+    objectKey: quote
+    domain: financial
+    description: Priced offer. Acts as revenue (sell) or cost (buy) depending on which side of the order it sits.
+    docs: https://roserocket.readme.io/docs/quotes
+  - name: FinancialLineItem
+    objectKey: financialLineItem
+    domain: financial
+    description: The money atom. Every financial object stores its amounts as connected financial line items.
+    docs: https://roserocket.readme.io/docs/financial-line-items
+  - name: Invoice
+    objectKey: invoice
+    domain: financial
+    description: Customer-facing billing document. subTotal is READ-ONLY, derived from its line items.
+    docs: https://roserocket.readme.io/docs/invoices
+  - name: Bill
+    objectKey: bill
+    domain: financial
+    description: Partner-facing cost document. Verifies and tracks what is owed to a carrier.
+    docs: https://roserocket.readme.io/docs/bills
+  - name: PayStub
+    objectKey: payStub
+    domain: financial
+    description: Driver pay document.
+    docs: https://roserocket.readme.io/docs/pay-stubs
+  - name: TaxRate
+    objectKey: taxRate
+    domain: financial
+    description: Applied to financial line items. Requires at least one connected tax rate component to function.
+    docs: https://roserocket.readme.io/docs/tax-rate-and-tax-rate-components
+  - name: TaxRateComponent
+    objectKey: taxRateComponent
+    domain: financial
+    description: The parts a tax rate is composed of.
+    docs: https://roserocket.readme.io/docs/tax-rate-and-tax-rate-components
+  - name: TaxRule
+    objectKey: taxRule
+    domain: financial
+    description: Decides which tax rate applies to which line items.
+    docs: https://roserocket.readme.io/docs/tax-rule
+  - name: GLAccount
+    objectKey: glAccount
+    domain: financial
+    description: General-ledger account a financial line item posts to.
+    docs: https://roserocket.readme.io/docs/gl-account
+  - name: FuelIndex
+    objectKey: fuelIndex
+    domain: rating
+    description: Regional fuel prices. Grouped by FuelIndexGroup and consumed by FuelTable breakpoints.
+    docs: https://roserocket.readme.io/docs/fuel-zones-and-tariffs
+  - name: Tariff
+    objectKey: tariff
+    domain: rating
+    description: Rating structure with dimensions, conversions, lanes and a status.
+    docs: https://roserocket.readme.io/docs/fuel-zones-and-tariffs
+  - name: Asset
+    objectKey: asset
+    domain: fleet
+    description: Truck or trailer. Carries plate number, compliance records and an assigned user.
+    docs: https://roserocket.readme.io/docs/assets
+  - name: Document
+    objectKey: document
+    domain: shared
+    description: Generated or uploaded file attached to almost any object (POD, POP, invoice PDF).
+    docs: https://roserocket.readme.io/docs/documents
+  - name: Tag
+    objectKey: tag
+    domain: shared
+    description: Free labels attached across objects.
+    docs: https://roserocket.readme.io/docs/tags
+  - name: User
+    objectKey: user
+    domain: identity
+    description: Person or service account in the org. Referenced as CSR, account manager, commissionee, driver.
+    docs: https://roserocket.readme.io/docs/roles-and-permissions
+  - name: UserGroup
+    objectKey: userGroup
+    domain: identity
+    description: 'The one entity with dedicated, typed operations in the OpenAPI: list, create, search, list members, add/remove members.'
+    docs: https://roserocket.readme.io/reference/listusergroups
+  - name: Board
+    objectKey: board
+    domain: platform
+    description: A saved view. Also a permission boundary — boardId is accepted on most read and write operations and changes what is visible.
+    docs: https://roserocket.readme.io/docs/using-boards-in-rose-rocket
+  - name: Event
+    objectKey: event
+    domain: platform
+    description: 'Activity on a record. Types: create, mutate, internal, widget-open, widget-close. The only paginated collection in the API.'
+    docs: https://roserocket.readme.io/reference/get_events
+  - name: WebhookDestination
+    objectKey: webhookDestination
+    domain: platform
+    description: A subscriber URL. Created through POST /objects like any other record.
+    docs: https://roserocket.readme.io/docs/webhooks-2
+  - name: WebhookSubscription
+    objectKey: webhookSubscription
+    domain: platform
+    description: Binds a destination to an eventName.
+    docs: https://roserocket.readme.io/docs/webhooks-2
+relationships:
+  - {from: Order, to: Customer, type: belongs_to, via: customer}
+  - {from: Order, to: Partner, type: belongs_to, via: partner}
+  - {from: Order, to: Task, type: has_many, via: tasks}
+  - {from: Order, to: Quote, type: has_one, via: sellQuote, note: The customer-facing (revenue) quote.}
+  - {from: Order, to: Quote, type: has_many, via: buyQuotes, note: The partner-facing (cost) quotes.}
+  - {from: Order, to: Tag, type: has_many, via: tags}
+  - {from: Order, to: Address, type: has_one, via: currentLocation}
+  - {from: Order, to: User, type: has_many, via: csrs}
+  - {from: Order, to: User, type: has_many, via: accountManagers}
+  - {from: Order, to: User, type: has_many, via: commissionees}
+  - {from: Order, to: Order, type: has_one, via: order, note: Self-reference — an order may point at a parent order.}
+  - {from: Task, to: Commodity, type: has_many, via: commodities}
+  - {from: Task, to: Stop, type: has_many, via: stops}
+  - {from: Stop, to: Task, type: has_many, via: tasks}
+  - {from: Stop, to: Document, type: has_many, via: documents, note: Proof of delivery and proof of pickup.}
+  - {from: Commodity, to: Task, type: has_many, via: tasks}
+  - {from: Manifest, to: Task, type: has_many, via: tasks}
+  - {from: Manifest, to: Document, type: has_many, via: documents}
+  - {from: Manifest, to: Bill, type: has_one, via: bill}
+  - {from: Manifest, to: Quote, type: has_many, via: quotes, note: Partner quotes on the manifest.}
+  - {from: Manifest, to: FinancialLineItem, type: has_many, via: lineItems}
+  - {from: Customer, to: Contact, type: has_many, via: contacts}
+  - {from: Customer, to: Address, type: has_many, via: locations}
+  - {from: Customer, to: Tag, type: has_many, via: tags}
+  - {from: Partner, to: Contact, type: has_many, via: contacts}
+  - {from: Partner, to: Address, type: has_one, via: address}
+  - {from: Partner, to: Compliance, type: has_many, via: compliance, note: 'Government identifiers: MCDID, DOT.'}
+  - {from: Partner, to: Lane, type: has_many, via: lanes}
+  - {from: Partner, to: AssetType, type: has_many, via: assetTypes}
+  - {from: Contact, to: Customer, type: belongs_to, via: customer}
+  - {from: Contact, to: Partner, type: belongs_to, via: partner}
+  - {from: Quote, to: Customer, type: belongs_to, via: customer}
+  - {from: Quote, to: Partner, type: belongs_to, via: partner}
+  - {from: Quote, to: Task, type: has_many, via: tasks}
+  - {from: Quote, to: Tag, type: has_many, via: tags}
+  - {from: Quote, to: User, type: has_many, via: users}
+  - {from: FinancialLineItem, to: Order, type: belongs_to, via: order}
+  - {from: FinancialLineItem, to: Quote, type: belongs_to, via: quote}
+  - {from: FinancialLineItem, to: Manifest, type: belongs_to, via: manifest}
+  - {from: FinancialLineItem, to: Invoice, type: belongs_to, via: invoice}
+  - {from: FinancialLineItem, to: Bill, type: belongs_to, via: bill}
+  - {from: FinancialLineItem, to: GLAccount, type: belongs_to, via: glAccount}
+  - {from: FinancialLineItem, to: TaxRate, type: belongs_to, via: taxRate}
+  - {from: FinancialLineItem, to: User, type: belongs_to, via: user}
+  - {from: FinancialLineItem, to: FinancialLineItem, type: has_one, via: copiedFrom, note: Financial workflow lineage — quoted to invoiced.}
+  - {from: FinancialLineItem, to: FinancialLineItem, type: has_many, via: copiedTo}
+  - {from: Invoice, to: Customer, type: belongs_to, via: customer}
+  - {from: Invoice, to: Address, type: has_one, via: address}
+  - {from: Invoice, to: FinancialLineItem, type: has_many, via: lineItems, note: 'subTotal is derived from this collection and is read-only.'}
+  - {from: Invoice, to: Document, type: has_many, via: documents}
+  - {from: Bill, to: Partner, type: belongs_to, via: partner}
+  - {from: Bill, to: Manifest, type: belongs_to, via: manifest}
+  - {from: Bill, to: FinancialLineItem, type: has_many, via: lineItems}
+  - {from: Bill, to: Document, type: has_many, via: documents}
+  - {from: PayStub, to: User, type: belongs_to, via: user, note: The driver being paid.}
+  - {from: PayStub, to: Manifest, type: belongs_to, via: manifest}
+  - {from: PayStub, to: FinancialLineItem, type: has_many, via: lineItems}
+  - {from: PayStub, to: Document, type: has_many, via: documents}
+  - {from: TaxRate, to: TaxRateComponent, type: has_many, via: taxRateComponents, note: Required — a tax rate does not function without at least one component.}
+  - {from: TaxRule, to: TaxRate, type: has_one, via: taxRate}
+  - {from: TaxRule, to: FinancialLineItem, type: has_many, via: lineItems}
+  - {from: Asset, to: User, type: has_many, via: users}
+  - {from: Asset, to: Compliance, type: has_many, via: compliance}
+  - {from: Asset, to: Tag, type: has_many, via: tags}
+  - {from: Tariff, to: FuelTable, type: has_one, via: fuelTable}
+  - {from: Tariff, to: TariffLane, type: has_many, via: lanes}
+  - {from: Tariff, to: TariffConversion, type: has_many, via: conversions}
+  - {from: Tariff, to: TariffDimension, type: has_one, via: dimensionOne}
+  - {from: Tariff, to: TariffDimension, type: has_one, via: dimensionTwo}
+  - {from: Tariff, to: Address, type: has_many, via: locations}
+  - {from: FuelTable, to: FuelIndexGroup, type: belongs_to, via: fuelIndex}
+  - {from: FuelTable, to: FuelTableBreakpoint, type: has_many, via: breakpoints}
+  - {from: FuelIndexGroup, to: FuelIndex, type: has_many, via: indexes}
+  - {from: WebhookDestination, to: WebhookSubscription, type: has_many, via: subscriptions}
+id_prefixes:
+  note: >-
+    fullId is a human-readable per-org sequence with a per-object prefix. Only two are
+    stated outright in the docs; the rest are visible in samples but not enumerated
+    anywhere, so they are NOT guessed here.
+  observed:
+    - {objectKey: customer, prefix: 'CUST-', example: CUST-9, source: https://roserocket.readme.io/docs/getting-started}
+    - {objectKey: order, prefix: 'O-', example: O-19, source: https://roserocket.readme.io/docs/manifest-1}
+    - {objectKey: manifest, prefix: 'M-O-', example: M-O-19, note: 'Composed from the order it covers.', source: https://roserocket.readme.io/docs/manifest-1}
+gaps:
+  - No entity schema is machine-readable. The OpenAPI has no domain models and no $ref graph between them.
+  - No endpoint enumerates the valid objectKey values, so a client cannot discover the entity list at runtime.
+  - No endpoint enumerates an organization's custom fields, which are a headline product feature.
+  - 'Several connected objects are named but have no reference page of their own: Compliance, Lane, AssetType, TariffLane, TariffDimension, TariffConversion, FuelTableBreakpoint.'

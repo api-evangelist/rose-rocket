@@ -1,0 +1,291 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Rose Rocket Platform Model API
+  version: 1.0.0
+  description: >-
+    An OpenAPI Overlay 1.0.0 document capturing the API Evangelist enrichment of
+    openapi/rose-rocket-platform-model-api.json. It is applied to that file and never
+    mutates it. Everything asserted here is sourced from Rose Rocket's own published
+    documentation, fetched 2026-08-26; nothing is invented.
+
+    Four things the original omits and this overlay supplies:
+      1. Authentication. The published spec declares no securitySchemes and no security
+         requirement, so a client generated from it emits unauthenticated requests. The
+         API is OAuth 2.0 bearer only.
+      2. The production base URL. The spec's servers[] offer a per-org subdomain template
+         and a generic roserocket.com host; every worked example in the docs uses
+         network.roserocket.com. The original servers are preserved and the documented
+         host is ADDED, not substituted.
+      3. Contact, licence and a real info.description — info.description is an empty
+         string in the original.
+      4. operationIds. Only 4 of 19 operations carry one, which leaves generated clients
+         naming 15 methods after their path.
+extends: ../openapi/rose-rocket-platform-model-api.json
+x-generated: '2026-08-26'
+x-method: generated
+x-source: >-
+  https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide,
+  https://roserocket.readme.io/docs/object-descriptions-and-operations,
+  https://roserocket.readme.io/docs/getting-started,
+  https://roserocket.readme.io/docs/webhooks-2,
+  https://a.roserocket.com/.well-known/openid-configuration (HTTP 200).
+actions:
+  - target: $.info
+    description: Fill in the empty info.description and add contact, licence and terms.
+    update:
+      description: >-
+        The Rose Rocket Platform Model API is a generic object API. One set of /objects
+        operations serves every domain entity in the platform — customer, order, task,
+        address, commodity, manifest, partner, quote, financialLineItem, invoice, bill,
+        tag, asset, contact, taxRate, payStub, document, webhookDestination — and the
+        `objectKey` field in the payload or path selects which one. Alongside it sit
+        typed user-group operations, board navigation and a per-record event feed.
+
+        All requests carry an OAuth 2.0 bearer token issued by https://a.roserocket.com
+        with audience https://roserocket.com. Credentials are not self-serve: existing
+        customers obtain them through an account representative and ISVs through the
+        Partnership team.
+
+        Because the object model is generic, the domain schema is NOT in this contract —
+        a record is modelled as JSONRecord { id, objectKey } plus a free-form `json`
+        bag. Field-level documentation for each entity lives at
+        https://roserocket.readme.io/docs/object-descriptions-and-operations and the
+        per-object reference pages; the entity graph derived from them is at
+        data-model/rose-rocket-data-model.yml.
+      contact:
+        name: Rose Rocket
+        url: https://roserocket.readme.io/
+        email: hello@roserocket.com
+      termsOfService: https://www.roserocket.com/terms
+      x-privacy-policy: https://www.roserocket.com/privacy
+      x-status-page: https://status.roserocket.com/
+      x-api-evangelist-note: >-
+        Enriched by API Evangelist. contact.email is the company's published general
+        address; Rose Rocket publishes no dedicated developer-support address.
+  - target: $
+    description: >-
+      Declare the OAuth 2.0 security schemes the docs describe but the contract omits,
+      and apply the bearer requirement globally.
+    update:
+      components:
+        securitySchemes:
+          oauth2AuthorizationCode:
+            type: oauth2
+            description: >-
+              End-user consent flow. Redirect to the authorization endpoint with
+              audience=https://roserocket.com, then exchange the code for an access
+              token. PKCE (S256) is supported by the authorization server. Source:
+              https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide
+            flows:
+              authorizationCode:
+                authorizationUrl: https://a.roserocket.com/authorize
+                tokenUrl: https://a.roserocket.com/oauth/token
+                refreshUrl: https://a.roserocket.com/oauth/token
+                scopes:
+                  offline_access: Issue a refresh token. Required for any long-lived integration.
+                  email: Add the email claim to the ID token. Identity only.
+                  profile: Add profile claims to the ID token. Identity only.
+          oauth2ClientCredentials:
+            type: oauth2
+            description: >-
+              Machine-to-machine service account. The token request carries org_id and
+              the service account's user_id alongside client_id and client_secret. The
+              service account defaults to the Manager role.
+            flows:
+              clientCredentials:
+                tokenUrl: https://a.roserocket.com/oauth/token
+                scopes: {}
+          bearerAuth:
+            type: http
+            scheme: bearer
+            bearerFormat: JWT
+            description: 'The access token from either flow, sent as Authorization: Bearer <access_token>.'
+        x-authorization-model: >-
+          NOTE: the scopes above are OIDC IDENTITY scopes. They grant no API permission.
+          Authorization is enforced server-side by the role held by the token's user or
+          service account, against a per-object, per-field permission matrix. A caller
+          cannot read its effective permissions from the token or from any published
+          scope list — it learns them from a 403. See scopes/rose-rocket-scopes.yml.
+      security:
+        - bearerAuth: []
+  - target: $.servers
+    description: >-
+      Add the production host every worked example in the documentation uses. The
+      original entries are preserved above it — this is an addition, not a repair.
+    update:
+      - url: https://network.roserocket.com/api/v2/platformModel
+        description: >-
+          The host used in every documented example (Getting Started, Object Operations,
+          Webhooks). Added by API Evangelist; not present in the published spec, which
+          offers a per-organization subdomain template and a generic roserocket.com host
+          instead. Source: https://roserocket.readme.io/docs/object-descriptions-and-operations
+  - target: $.paths['/objects'].post
+    description: Add the missing operationId and record the retry hazard.
+    update:
+      operationId: createObject
+      x-idempotent: false
+      x-idempotency-note: >-
+        POST is NOT retry-safe. The provider states that upsert "is not supported with
+        POST"; a retried POST with no externalId creates a duplicate record. Use
+        PATCH /objects with an externalId to retry a create safely.
+  - target: $.paths['/objects'].patch
+    description: Add the missing operationId and record the idempotency mechanism.
+    update:
+      operationId: upsertObjectByExternalId
+      x-idempotent: true
+      x-idempotency-key: json.externalId
+      x-idempotency-note: >-
+        Idempotent by externalId. No match creates the record and returns 201; a match
+        updates it and returns 200. This is the mechanism Rose Rocket documents for
+        preventing duplicates when synchronising an external system.
+        Source: https://roserocket.readme.io/docs/upserts-and-external-ids
+  - target: $.paths['/objects/{recordId}'].get
+    description: Add the missing operationId and document the expansion parameter.
+    update:
+      operationId: getObjectById
+      x-expansion:
+        parameter: paths
+        style: comma-separated list of connected object names
+        example: '?paths=commodities,relatedCommodities,stops'
+        note: Connected objects are omitted from a default GET and must be named to be returned.
+  - target: $.paths['/objects/{recordId}'].put
+    update:
+      operationId: updateObjectById
+      x-idempotent: true
+  - target: $.paths['/objects/{recordId}'].delete
+    description: Record that this operation cannot be reversed.
+    update:
+      operationId: deleteObjectById
+      x-idempotent: true
+      x-destructive: true
+      x-reversible: false
+      x-reversibility-note: >-
+        No undo, restore, trash or soft-delete surface is documented, and no retention
+        window is stated. Treat as final. See the reversibility block in
+        conventions/rose-rocket-conventions.yml.
+  - target: $.paths['/objects/bulk_delete'].post
+    description: Record the blast radius of the least-documented operation in the contract.
+    update:
+      operationId: bulkDeleteObjects
+      x-destructive: true
+      x-reversible: false
+      x-reversibility-note: >-
+        Deletes an arbitrary array of record ids in a single call and returns 204 with no
+        body — no per-id result, no partial-failure report and no reversal path. The
+        highest-risk operation published, and the one with the least documented safety.
+  - target: $.paths['/objects/search'].post
+    description: Add the missing operationId and record the pagination gap.
+    update:
+      operationId: searchObjects
+      x-pagination:
+        style: limit-only
+        parameters: [limit, orderByPath, orderByDirection]
+        gap: >-
+          No offset, cursor or page token, and no documented total count. A result set
+          larger than `limit` cannot be walked. Compare GET /events, which supports
+          limit, offset and an opaque bookmark.
+  - target: $.paths['/objects/autocomplete'].get
+    update:
+      operationId: autocompleteObjects
+  - target: $.paths['/objects/{objectKey}/{externalId}/external'].get
+    update:
+      operationId: getObjectByExternalId
+  - target: $.paths['/objects/{objectKey}/{externalId}/external'].patch
+    update:
+      operationId: upsertObjectByObjectKeyAndExternalId
+      x-idempotent: true
+  - target: $.paths['/objects/{objectKey}/{externalId}/external'].delete
+    update:
+      operationId: deleteObjectByExternalId
+      x-destructive: true
+      x-reversible: false
+  - target: $.paths['/events'].get
+    description: Add the missing operationId and record that this is a per-record feed only.
+    update:
+      operationId: listEvents
+      x-pagination:
+        style: offset + opaque bookmark
+        parameters: [limit, offset, bookmark, orderBy, orderByDirection]
+      x-scope-note: >-
+        recordId and objectKey are both REQUIRED. There is no org-wide or
+        since-timestamp event stream, so this cannot be polled as a substitute for a
+        missed webhook unless the caller already knows which record to ask about.
+  - target: $.paths['/events'].post
+    update:
+      operationId: createEvent
+  - target: $.paths['/boards/nav'].get
+    update:
+      operationId: listBoards
+      x-note: >-
+        A board is a saved view AND a permission boundary. Most read and write operations
+        accept a boardId, and what a role may see through a board is configurable, so the
+        same record can render differently depending on the boardId supplied.
+  - target: $.paths['/userGroups'].get
+    description: Record the permission the spec names only in a 403 description.
+    update:
+      x-required-permission:
+        name: userGroupResource
+        level: viewer
+  - target: $.paths['/userGroups'].post
+    update:
+      x-required-permission:
+        name: userGroupResource
+        level: editor
+  - target: $.paths['/userGroups/{groupId}/members'].post
+    update:
+      x-required-permission:
+        name: userGroupResource
+        level: editor
+      x-reversible: true
+      x-reversibility-note: >-
+        Symmetric by construction — a removal is undone by an add on the same endpoint.
+        Removal takes precedence over addition when a user id appears in both collections.
+  - target: $.components.schemas.JSONRecord
+    description: >-
+      Document the base record fields observed consistently in the provider's own
+      response samples but absent from the schema, which declares only id and objectKey.
+    update:
+      x-common-fields-note: >-
+        Every record in every documented response also carries orgId, source, fullId,
+        externalId, status, createdAt, createdBy, updatedAt, updatedBy, version, widgets[]
+        and widgetToOpen. They are not declared here, so a generated model drops them.
+        Source: https://roserocket.readme.io/docs/getting-started and the per-object
+        reference pages. See data-model/rose-rocket-data-model.yml.
+      x-domain-schema-gap: >-
+        The `json` bag on every write is untyped. The valid objectKey values, their
+        fields and their connected objects exist only as prose. No endpoint enumerates
+        them, and custom fields — a headline product feature — are not discoverable at all.
+  - target: $
+    description: Record the cross-cutting semantics that have no home in the OpenAPI document.
+    update:
+      x-error-envelope:
+        format: custom
+        rfc9457: false
+        shape: '{ "statusCode": number, "message": string | string[], "error": string }'
+        note: >-
+          message is an ARRAY of strings on 400 validation failures and a plain string
+          otherwise. The 14 object-record operations declare no error responses at all;
+          the envelope above is documented in prose and declared only on the user-group
+          operations. See errors/rose-rocket-problem-types.yml.
+      x-rate-limits:
+        published: false
+        headers: none documented
+        status_on_exhaustion: not documented
+        note: No 429 is declared anywhere in the contract or the docs. See rate-limits/rose-rocket-rate-limits.yml.
+      x-webhooks:
+        documented: true
+        asyncapi: false
+        events: 1
+        note: >-
+          Webhook destinations and subscriptions are created through POST /objects like
+          any other record, using objectKey webhookDestination. One event is documented
+          (Order Status Changed). Deliveries carry no signature. See
+          asyncapi/rose-rocket-webhooks.yml.
+      x-undocumented-endpoint:
+        path: /permissions/roles/{role}/objectKey/{object}
+        method: POST
+        note: >-
+          Documented in prose at https://roserocket.readme.io/docs/roles-and-permissions,
+          with a full example payload, but absent from this contract. Recorded here as a
+          known gap; NOT added as a path, because API Evangelist has not verified its
+          request or response schema against a live call.

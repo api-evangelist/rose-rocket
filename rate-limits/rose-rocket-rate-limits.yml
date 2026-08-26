@@ -1,0 +1,49 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  Searched every published Rose Rocket developer page on 2026-08-26 — the full page
+  index at https://roserocket.readme.io/llms.txt, /docs/getting-started,
+  /docs/rose-rocket-api-oauth-20-authentication-guide,
+  /docs/object-descriptions-and-operations, /docs/upserts-and-external-ids,
+  /docs/webhooks-2, /docs/roles-and-permissions,
+  /docs/application-lifecycle-management (all HTTP 200) — plus every response
+  declaration in openapi/rose-rocket-platform-model-api.json and the pricing page at
+  https://www.roserocket.com/pricing (HTTP 200).
+limit_count: 0
+description: >-
+  Rose Rocket publishes NO rate limits for the Platform Model API. This is a genuine
+  zero, not an unchecked one: no limits page exists, no quota or throttle is
+  mentioned on any of the eight documentation pages, no 429 response is declared on
+  any of the 19 operations in the spec, and no rate-limit header appears anywhere in
+  the contract or the docs. The nearest thing to a statement is the Enterprise tier
+  feature bullet "unlimited API access" on the pricing page, which is a commercial
+  entitlement rather than a runtime limit. An agent integrating here has no published
+  budget to plan against and no runtime signal to back off on — it will discover any
+  throttle only by being throttled, and cannot distinguish that from a 500.
+limits: []
+headers:
+  documented: false
+  standard_ratelimit_headers: not documented
+  x_ratelimit_headers: not documented
+  retry_after: not documented
+  note: >-
+    Neither the RFC 9239-style RateLimit-* family nor the X-RateLimit-* convention is
+    documented, and no Retry-After is mentioned. Not probed live: the API requires an
+    OAuth bearer token issued by an account representative, so no unauthenticated
+    response is observable.
+status_on_exhaustion:
+  documented: false
+  note: >-
+    429 does not appear in the spec or in either of the two error tables the docs
+    publish (object CRUD, webhooks). Both tables jump from 404 to 500.
+adjacent_limits_note: The only quantified operational limits Rose Rocket does publish. None of them is a request rate.
+adjacent_limits:
+  - {scope: webhook delivery retries, limit: 3 attempts, window: 30-second delay between attempts, source: 'https://roserocket.readme.io/docs/webhooks-2'}
+  - {scope: webhook receipt history, limit: 7 days, window: rolling, source: 'https://roserocket.readme.io/docs/webhooks-2'}
+  - {scope: access token lifetime, limit: deliberately unspecified and variable, window: n/a, source: 'https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide'}
+  - {scope: POST /objects/search result set, limit: caller-supplied `limit` with no documented maximum and no way to page past it, window: per request, source: openapi/rose-rocket-platform-model-api.json}
+gaps:
+  - No published request rate, burst, quota or concurrency limit at any scope.
+  - No 429 declared and no exhaustion behaviour documented.
+  - No rate-limit response headers, so a client cannot adapt at runtime.
+  - '"Unlimited API access" is asserted on the Enterprise tier without a fair-use definition.'

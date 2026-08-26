@@ -1,0 +1,51 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://registry.npmjs.org/-/v1/search?text=roserocket (package metadata read
+  2026-08-26) and https://roserocket.readme.io/docs/object-builder — the widget
+  and data-panel model these libraries render against.
+description: >-
+  Rose Rocket ships a client-side component layer distinct from its API client:
+  "Zinnia", the Rose Rocket design system, plus a widget toolkit for building
+  the in-platform widgets that appear on an object's data panel. These are
+  npm-distributed React/web libraries, not hosted embeds — there is no
+  script-tag/CDN surface and no hosted iframe component documented. The
+  in-product concept they attach to (widgets on an object record, boards and
+  data-panel views) is documented in the Object Builder and Boards guides; the
+  libraries themselves carry no published README or API reference, so this
+  artifact records the distribution facts and the platform concept, not an
+  invented component inventory.
+docs:
+  - https://roserocket.readme.io/docs/object-builder
+  - https://roserocket.readme.io/docs/using-boards-in-rose-rocket
+libraries:
+  - {name: '@roserocket-sdk/widget-toolkit', version: 0.0.9, published: '2025-03-14', purpose: Widget building blocks — the toolkit for building widgets that mount on a Rose Rocket object data panel.}
+  - {name: '@roserocket-sdk/zinnia-particles', version: 1.4.0, published: '2026-07-22', purpose: Building blocks of Rose Rocket's design system (framework-agnostic layer).}
+  - {name: '@roserocket-sdk/zinnia-particles-react-web', version: 0.0.15, published: '2026-07-22', purpose: React Web bindings for the design-system particles.}
+  - {name: '@roserocket-sdk/zinnia-atoms-react-web', version: 0.0.15, published: '2026-07-22', purpose: Atoms in the Rose Rocket design system (React Web).}
+  - {name: '@roserocket-sdk/zinnia-primitives-react-web', version: 0.0.4, published: '2025-09-30', purpose: Utilities for building components in the design system.}
+  - {name: '@roserocket-sdk/configurables', version: 0.0.2, published: '2025-12-15', purpose: Rose Rocket configurables.}
+families:
+  design_system:
+    name: Zinnia
+    description: >-
+      Rose Rocket's design system, published as a particles/atoms/primitives
+      layering with a framework-agnostic core and React Web bindings. Versions
+      are pre-1.0 for every React package, which is the provider's own signal
+      about stability.
+    packages: ['@roserocket-sdk/zinnia-particles', '@roserocket-sdk/zinnia-particles-react-web', '@roserocket-sdk/zinnia-atoms-react-web', '@roserocket-sdk/zinnia-primitives-react-web']
+  widgets:
+    name: Widget toolkit
+    description: >-
+      Widgets are the extension point on a Rose Rocket object record: an object
+      response carries a `widgets[]` array (each entry has key, name, version)
+      and a `widgetToOpen` pointer, observed verbatim in the create-customer
+      response sample in the Getting Started guide. @roserocket-sdk/widget-toolkit
+      is the library for building them.
+    packages: ['@roserocket-sdk/widget-toolkit']
+    evidence: https://roserocket.readme.io/docs/getting-started
+hosted_embeds: []
+hosted_embeds_note: >-
+  None found. Board views can be shared out of the product as a public link or
+  CSV export (https://roserocket.readme.io/docs/using-boards-in-rose-rocket),
+  but that is a product share feature, not a documented embeddable component.

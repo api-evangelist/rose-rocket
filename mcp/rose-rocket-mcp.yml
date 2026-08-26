@@ -1,0 +1,77 @@
+generated: '2026-08-26'
+method: derived
+status: candidate
+source: >-
+  Derived from the operations in openapi/rose-rocket-platform-model-api.json after a
+  search for a published server found none. Search performed 2026-08-26.
+description: >-
+  Rose Rocket ships NO MCP server. This file is a CANDIDATE tool list derived from
+  the published OpenAPI so the shape of an agent surface is on the record; nothing in
+  it is offered by the provider and no endpoint below is real. The finding is worth
+  stating plainly because Rose Rocket markets AI agents hard — TED, Rosie and Rocky
+  are on the pricing page, included on every plan with "no limits on invocations" —
+  and every one of them is an in-product agent. There is no way for an agent OUTSIDE
+  Rose Rocket to reach the platform except by writing an OAuth 2.0 REST client
+  against 19 generic object operations, using credentials that only an account
+  representative can issue.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: probed
+  note: >-
+    mode is none because nobody ships a server. No endpoint is invented here.
+search:
+  probed: '2026-08-26'
+  method: POST {"jsonrpc":"2.0","id":1,"method":"tools/list"} with Accept application/json, text/event-stream
+  probes:
+    - {url: 'https://mcp.roserocket.com/mcp', status: 404}
+    - {url: 'https://network.roserocket.com/mcp', status: 404, body: '{"message":"Cannot POST /mcp","error":"Not Found","statusCode":404}'}
+    - {url: 'https://roserocket.com/mcp', status: 404}
+    - {url: 'https://api.roserocket.com/mcp', status: 404}
+    - {url: 'https://network.roserocket.com/api/v2/platformModel/mcp', status: 404}
+  registries:
+    - {registry: npm, query: 'roserocket mcp', result: 'No Rose Rocket MCP package. The first-party @roserocket-sdk scope holds 15 packages — an API client, the rock CLI, and the Zinnia design system — and none is an MCP server.'}
+  docs:
+    - {source: 'https://roserocket.readme.io/llms.txt', result: 'The provider''s own complete page index. No MCP, connector or agent-integration page.'}
+    - {source: 'https://www.roserocket.com/solutions/agents', result: 'Describes TED, Rosie and Rocky as in-product agents invoked from workflows. No external protocol, no endpoint, no tool schema.'}
+  agent_card: {result: 'No A2A agent card either — /.well-known/agent-card.json and /.well-known/agent.json return 404 on all six hosts. See well-known/rose-rocket-well-known.yml.'}
+candidate_tools_note: >-
+  DERIVED, NOT OFFERED. Each tool below binds to a real operation in the published
+  OpenAPI and would inherit that operation's parameters as its inputSchema. The generic
+  object model makes this awkward in a way worth recording: a single get_object tool
+  covers every entity in the platform, so an agent cannot be told from the schema what
+  a "customer" or an "order" actually contains — the domain shape is in prose only
+  (see data-model/rose-rocket-data-model.yml).
+candidate_tools:
+  - {tool: get_object, rest: 'GET /objects/{recordId}', category: records, description: 'Fetch any record by id, optionally expanding connected objects via paths.'}
+  - {tool: get_object_by_external_id, rest: 'GET /objects/{objectKey}/{externalId}/external', category: records, description: Fetch a record by caller-owned external id.}
+  - {tool: search_objects, rest: POST /objects/search, category: records, description: 'Filtered, ordered, limited search within a board context.'}
+  - {tool: autocomplete_objects, rest: GET /objects/autocomplete, category: records, description: Match records of one objectKey against a search term.}
+  - {tool: create_object, rest: POST /objects, category: records, write: true, description: Create a record of any objectKey, including nested connected objects.}
+  - {tool: update_object, rest: 'PUT /objects/{recordId}', category: records, write: true, description: Full update of a record.}
+  - {tool: upsert_object, rest: PATCH /objects, category: records, write: true, description: Create or update by externalId. The retry-safe write path.}
+  - {tool: upsert_object_by_external_id, rest: 'PATCH /objects/{objectKey}/{externalId}/external', category: records, write: true}
+  - {tool: delete_object, rest: 'DELETE /objects/{recordId}', category: records, write: true, destructive: true, note: No reversal path exists. See the reversibility block in conventions/.}
+  - {tool: delete_object_by_external_id, rest: 'DELETE /objects/{objectKey}/{externalId}/external', category: records, write: true, destructive: true}
+  - {tool: bulk_delete_objects, rest: POST /objects/bulk_delete, category: records, write: true, destructive: true, note: Highest blast radius in the contract; no undo.}
+  - {tool: list_events, rest: GET /events, category: events, description: 'Activity on one record. recordId and objectKey are both required, so there is no org-wide feed.'}
+  - {tool: create_event, rest: POST /events, category: events, write: true}
+  - {tool: list_boards, rest: GET /boards/nav, category: boards, description: List the boards (saved views) available for navigation.}
+  - {tool: list_user_groups, rest: GET /userGroups, category: identity}
+  - {tool: search_user_groups, rest: POST /userGroups/search, category: identity}
+  - {tool: create_user_group, rest: POST /userGroups, category: identity, write: true}
+  - {tool: list_user_group_members, rest: 'GET /userGroups/{groupId}/members', category: identity}
+  - {tool: modify_user_group_members, rest: 'POST /userGroups/{groupId}/members', category: identity, write: true, note: Add and remove in one call; removal wins if a user id appears in both.}
+coverage:
+  openapi_operations: 19
+  candidate_tools: 19
+  mapped: 19
+  unmapped: 0
+blockers_for_a_real_server:
+  - No self-serve credentials. An MCP server would need an OAuth client only an account representative can issue.
+  - No machine-readable domain schema, so tool inputs cannot be validated beyond {objectKey, json}.
+  - No securitySchemes in the OpenAPI, so an MCP generator has no auth declaration to read.
+  - Destructive operations (delete, bulk_delete) have no reversal path and no dry-run mode.

@@ -1,0 +1,206 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://registry.npmjs.org/-/v1/search?text=roserocket — the first-party npm
+  scope @roserocket-sdk, confirmed first-party by the GitHub organization
+  github.com/RoseRocketSDK ("Rose Rocket SDK", blog roserocket.com, email
+  hello@roserocket.com) and by the license string on every package,
+  "All rights reserved by Rose Rocket, Inc.". Versions and publish dates read
+  from registry.npmjs.org package metadata on 2026-08-26.
+description: >-
+  Rose Rocket ships a first-party npm scope, @roserocket-sdk, that covers three
+  distinct things: an API client (api-client, client-types-generator), an
+  external developer CLI (rock-cli, rock-cli-core — catalogued in
+  cli/rose-rocket-cli.yml), and the Zinnia design system + widget toolkit used to
+  build in-platform widgets (catalogued in components/rose-rocket-components.yml).
+  There is NO Rose Rocket package on PyPI, RubyGems, Packagist, crates.io,
+  NuGet, Maven Central or pkg.go.dev — every probe returned 404/empty. The
+  monorepo the packages point at, github.com/RoseRocketSDK/roserocket-sdk, is
+  NOT public: the org shows 0 public repositories, so the source is closed even
+  though the artifacts are published.
+registries_probed:
+  - {registry: npm, url: 'https://registry.npmjs.org/-/v1/search?text=roserocket', status: 200, result: 15 first-party packages}
+  - {registry: pypi, url: 'https://pypi.org/pypi/roserocket/json', status: 404, result: none}
+  - {registry: pypi, url: 'https://pypi.org/pypi/rose-rocket/json', status: 404, result: none}
+  - {registry: rubygems, url: 'https://rubygems.org/api/v1/search.json?query=roserocket', status: 200, result: empty array}
+  - {registry: packagist, url: 'https://packagist.org/search.json?q=roserocket', status: 200, result: no first-party match}
+  - {registry: crates.io, url: 'https://crates.io/api/v1/crates?q=roserocket', status: 200, result: empty}
+packages:
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/api-client'
+    url: https://www.npmjs.com/package/@roserocket-sdk/api-client
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/api-client
+    official: true
+    kind: sdk
+    version: 1.0.5
+    published: '2025-09-25'
+    license: All rights reserved by Rose Rocket, Inc.
+    note: >-
+      The Rose Rocket API client. Last published 2025-09-25 — eleven months before
+      this probe, and it has not moved while the design-system packages in the
+      same scope shipped through 2026-08. Treat currency of the client as an open
+      question against the live Platform Model API.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/client-types-generator'
+    url: https://www.npmjs.com/package/@roserocket-sdk/client-types-generator
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/client-types-generator
+    official: true
+    kind: codegen
+    version: 1.0.9
+    published: '2025-09-25'
+    bin: [cli.js]
+    license: All rights reserved by Rose Rocket, Inc.
+    note: Generates TypeScript types for the Rose Rocket API client.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/rock-cli'
+    url: https://www.npmjs.com/package/@roserocket-sdk/rock-cli
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install -g @roserocket-sdk/rock-cli
+    official: true
+    kind: cli
+    binary: rock
+    version: 1.2.16
+    published: '2026-06-29'
+    license: All rights reserved by Rose Rocket, Inc.
+    note: '"Rock is Rose Rocket''s External developer CLI." See cli/rose-rocket-cli.yml.'
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/rock-cli-core'
+    url: https://www.npmjs.com/package/@roserocket-sdk/rock-cli-core
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/rock-cli-core
+    official: true
+    kind: cli
+    binary: rock-core
+    version: 1.9.0
+    published: '2026-06-29'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/widget-toolkit'
+    url: https://www.npmjs.com/package/@roserocket-sdk/widget-toolkit
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/widget-toolkit
+    official: true
+    kind: components
+    version: 0.0.9
+    published: '2025-03-14'
+    license: All rights reserved by Rose Rocket, Inc.
+    note: Widget building blocks for extending the Rose Rocket UI. Oldest package in the scope.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/primitives'
+    url: https://www.npmjs.com/package/@roserocket-sdk/primitives
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/primitives
+    official: true
+    kind: types
+    version: 3.1.0
+    published: '2026-08-24'
+    license: All rights reserved by Rose Rocket, Inc.
+    note: Most recently published package in the scope (two days before this probe).
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/type-utils'
+    url: https://www.npmjs.com/package/@roserocket-sdk/type-utils
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/type-utils
+    official: true
+    kind: types
+    version: 1.1.0
+    published: '2025-05-06'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/configurables'
+    url: https://www.npmjs.com/package/@roserocket-sdk/configurables
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/configurables
+    official: true
+    kind: components
+    version: 0.0.2
+    published: '2025-12-15'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/zinnia-particles'
+    url: https://www.npmjs.com/package/@roserocket-sdk/zinnia-particles
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/zinnia-particles
+    official: true
+    kind: design-system
+    version: 1.4.0
+    published: '2026-07-22'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/zinnia-particles-react-web'
+    url: https://www.npmjs.com/package/@roserocket-sdk/zinnia-particles-react-web
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/zinnia-particles-react-web
+    official: true
+    kind: design-system
+    version: 0.0.15
+    published: '2026-07-22'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/zinnia-atoms-react-web'
+    url: https://www.npmjs.com/package/@roserocket-sdk/zinnia-atoms-react-web
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/zinnia-atoms-react-web
+    official: true
+    kind: design-system
+    version: 0.0.15
+    published: '2026-07-22'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/zinnia-primitives-react-web'
+    url: https://www.npmjs.com/package/@roserocket-sdk/zinnia-primitives-react-web
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/zinnia-primitives-react-web
+    official: true
+    kind: design-system
+    version: 0.0.4
+    published: '2025-09-30'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/exec'
+    url: https://www.npmjs.com/package/@roserocket-sdk/exec
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install @roserocket-sdk/exec
+    official: true
+    kind: utility
+    version: 1.0.10
+    published: '2025-10-23'
+    license: MIT
+    note: Child-process management utilities. The only MIT-licensed package in the scope.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/eslint-config'
+    url: https://www.npmjs.com/package/@roserocket-sdk/eslint-config
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install -D @roserocket-sdk/eslint-config
+    official: true
+    kind: tooling
+    version: 1.2.4
+    published: '2025-10-22'
+    license: All rights reserved by Rose Rocket, Inc.
+  - language: javascript
+    registry: npm
+    name: '@roserocket-sdk/prettier-config'
+    url: https://www.npmjs.com/package/@roserocket-sdk/prettier-config
+    source: https://github.com/RoseRocketSDK/roserocket-sdk
+    install: npm install -D @roserocket-sdk/prettier-config
+    official: true
+    kind: tooling
+    version: 1.0.0
+    published: '2025-10-22'
+    license: All rights reserved by Rose Rocket, Inc.

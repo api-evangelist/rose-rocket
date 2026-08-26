@@ -1,0 +1,91 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://roserocket.readme.io/changelog, https://roserocket.readme.io/llms.txt,
+  https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide,
+  https://roserocket.readme.io/docs/application-lifecycle-management,
+  https://status.roserocket.com/ (HTTP 200, Atlassian Statuspage, probed 2026-08-26)
+  and openapi/rose-rocket-platform-model-api.json.
+description: >-
+  Rose Rocket publishes an operational status page and a versioned API path, and
+  nothing else about lifecycle. There is no versioning policy, no deprecation policy,
+  no Sunset or Deprecation header commitment, no published SLA, no end-of-life notice
+  channel and no dated API changelog — the developer hub's changelog holds two posts,
+  both from the day it launched in January 2025. A v1 surface still appears in the
+  provider's own current authentication example alongside v2, with no statement about
+  whether v1 is supported, frozen or scheduled for removal. An integrator has no
+  published way to learn that something is going away.
+versioning:
+  scheme: path-based major version
+  current: v2
+  path: /api/v2/platformModel
+  header_versioning: false
+  content_negotiation: false
+  policy_published: false
+  prior_versions:
+    - version: v1
+      path: /api/v1
+      status: unclear
+      evidence: >-
+        The Authentication Guide (updated 2025-05-29) demonstrates a token in use
+        against https://network.roserocket.com/api/v1/me. No page states whether v1 is
+        supported, deprecated or frozen, and no v1 reference documentation is published
+        on the current hub.
+deprecation:
+  policy_published: false
+  policy_url: null
+  sunset_header: not documented
+  deprecation_header: not documented
+  rfc8594: false
+  advance_notice: not documented
+  deprecated_operations: []
+  deprecated_operations_note: >-
+    Derived from the spec: no operation, parameter or schema in
+    openapi/rose-rocket-platform-model-api.json carries `deprecated: true`.
+  irreversible_actions:
+    - Deleting an OAuth application cannot be undone and immediately revokes that application's API access.
+    - Rotating a client secret invalidates the previous secret immediately, with no overlap window.
+    - source: https://roserocket.readme.io/docs/application-lifecycle-management
+status_page:
+  url: https://status.roserocket.com/
+  provider: Atlassian Statuspage
+  status: 200
+  probed: '2026-08-26'
+  machine_readable:
+    note: >-
+      Atlassian Statuspage exposes a standard JSON API at /api/v2/status.json and
+      /api/v2/summary.json on any Statuspage host. Not probed in this pass; recorded as
+      the platform default, not as a provider claim.
+  subscribe: Statuspage subscription (email/RSS) as offered by the hosted page.
+sla:
+  published: false
+  note: >-
+    No uptime or support SLA is published on the public site. The pricing page lists
+    "Priority support & custom SLAs" as an ENTERPRISE tier feature, which places the
+    SLA behind a sales conversation rather than in the public record.
+  source: https://www.roserocket.com/pricing
+changelog:
+  url: https://roserocket.readme.io/changelog
+  entry_count: 2
+  last_entry: '2025-01-07'
+  api_changes_recorded: 0
+  note: >-
+    Both entries are hub-launch announcements. 19 months elapsed with no entry while
+    the first-party npm client scope shipped repeatedly (rock-cli 1.2.16 on 2026-06-29,
+    primitives 3.1.0 on 2026-08-24). See changelog/rose-rocket-changelog.yml.
+support_channels:
+  - {type: HelpCenter, url: 'https://help.roserocket.com/'}
+  - {type: Email, url: 'mailto:hello@roserocket.com'}
+  - {type: Phone, url: 'tel:+18889190092'}
+  - {type: SecurityDisclosure, url: 'mailto:responsibledisclosure@roserocket.com'}
+access_lifecycle:
+  onboarding: >-
+    Not self-serve. Existing customers obtain API credentials through an account
+    representative; ISVs go through the Partnership team. There is no developer
+    signup, no free tier and no sandbox.
+  source: https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide
+gaps:
+  - No deprecation policy and no Sunset/Deprecation header commitment (RFC 8594).
+  - No dated API changelog since 2025-01-07.
+  - v1 and v2 both appear in current documentation with no statement of v1's status.
+  - No published SLA outside the Enterprise tier.

@@ -1,0 +1,96 @@
+generated: '2026-08-26'
+method: searched
+source: https://www.roserocket.com/pricing
+source_status: 200
+probed: '2026-08-26'
+description: >-
+  Rose Rocket publishes a real, named two-tier price list on its pricing page, which
+  is more than most enterprise TMS vendors do — one tier even carries a number. But
+  it prices the PLATFORM, not the API. There is no API plan, no per-call rate, no
+  included call quota and no overage schedule anywhere on the page or in the
+  developer docs. The only API line item is a feature bullet on the Enterprise tier
+  ("Custom integrations & unlimited API access"), which reads as API access being an
+  Enterprise-tier concern rather than something included with the entry plan. Neither
+  tier can be bought online: both buttons say "Talk to Sales".
+currency: USD
+billing_period: monthly
+self_serve_purchase: false
+free_tier: false
+trial: false
+plan_count: 2
+plans:
+  - name: Full Service Platform
+    tagline: Complete platform + white-glove implementation.
+    price: 2080
+    price_display: Starting at $2080/month
+    price_qualifier: starting-at
+    currency: USD
+    billing_period: month
+    cta: Talk to Sales
+    self_serve: false
+    most_popular: true
+    included:
+      - Unlimited users, custom fields, automations
+      - All AI agents (TED, Rosie, Rocky) included
+      - Order, dispatch, tracking & invoicing
+      - Custom boards & no-code workflows
+      - White-glove implementation (90-day go-live)
+    api_access: not stated
+    api_access_note: >-
+      The page does not say whether the Platform Model API is included at this tier.
+      "Unlimited API access" appears only on the Enterprise tier.
+    quota: none published
+    overage: none published
+  - name: Enterprise
+    tagline: Tired of Build vs Buy decisions? Get the best of both — build on the last TMS you'll buy.
+    price: null
+    price_display: CUSTOM PRICING
+    currency: USD
+    billing_period: null
+    cta: Talk to Sales
+    self_serve: false
+    included:
+      - Everything in Full Service Platform
+      - Dedicated account management
+      - Priority support & custom SLAs
+      - Advanced security (SSO, SAML)
+      - Custom integrations & unlimited API access
+    api_access: included — "unlimited API access"
+    api_access_note: >-
+      The only explicit API entitlement Rose Rocket publishes. "Unlimited" is stated
+      without a quota, a rate limit or a fair-use clause, and no rate limits are
+      documented elsewhere either — see rate-limits/rose-rocket-rate-limits.yml.
+    quota: unlimited (stated, unqualified)
+    overage: not applicable
+ai_agents:
+  note: >-
+    Priced as a platform inclusion rather than a metered product, which is unusual and
+    worth recording verbatim.
+  statement: >-
+    "Every plan includes unlimited access to our AI agents. No per-use fees. No limits
+    on invocations."
+  agents:
+    - {name: TED, role: Email assistant. Turns emails into orders, keeps orders updated from email, syncs documents into the TMS.}
+    - {name: Rosie, role: Order assistant with full context on a record. Answers questions and surfaces insights against actual data.}
+    - {name: Rocky, role: Generalist. Builds workflows, answers questions, onboards and optimizes across the platform.}
+  api_exposed: false
+  api_exposed_note: >-
+    These agents are in-product surfaces. Nothing published exposes them through the
+    API, and no MCP endpoint exists — see mcp/rose-rocket-mcp.yml.
+api_pricing:
+  published: false
+  metered: false
+  per_call_pricing: none published
+  included_quota: none published
+  overage: none published
+  developer_free_tier: false
+  note: >-
+    API access is not purchasable and not priced separately. Credentials are provisioned
+    by an account representative (existing customers) or the Partnership team (ISVs) —
+    see authentication/rose-rocket-authentication.yml.
+comparison_claims:
+  note: Rose Rocket frames its price against two alternatives on the same page. Recorded as published claims, not as verified market data.
+  claims:
+    - {alternative: Generic Cloud TMS, stated_cost: $12K-$40K/month, stated_time_to_live: 6+ months}
+    - {alternative: Enterprise ERP / custom build, stated_cost: $20K-$40K/month plus $150K-$500K implementation, stated_time_to_live: 12-24 months}
+    - {alternative: Rose Rocket, stated_cost: Starting at $2080/month, stated_time_to_live: Guaranteed 90 days}

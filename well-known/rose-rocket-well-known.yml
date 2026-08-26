@@ -1,0 +1,121 @@
+generated: '2026-08-26'
+method: probed
+source: >-
+  Direct HTTPS probes run 2026-08-26 against every host in apis.yml (baseURL),
+  every OpenAPI servers[] host, the auth host named in the Authentication Guide,
+  and the docs host. Status is the HTTP code observed at fetch time.
+description: >-
+  Rose Rocket serves a REAL discovery surface on exactly one host: a.roserocket.com,
+  the Auth0-backed authorization server named in the Authentication Guide, which
+  answers both /.well-known/openid-configuration and
+  /.well-known/oauth-authorization-server with a full OIDC/OAuth 2.0 discovery
+  document. No other host serves anything: no security.txt (the responsible
+  disclosure policy is an HTML page at www.roserocket.com/responsible-disclosure,
+  not a machine-readable security.txt), no api-catalog, no ai-plugin.json, and no
+  A2A agent card on any host or either path. The provider's own docs host,
+  roserocket.readme.io, does serve /llms.txt (200) — saved in llms/.
+hosts:
+  - host: https://a.roserocket.com
+    documents:
+      - path: /.well-known/openid-configuration
+        status: 200
+        type: application/json
+        file: rose-rocket-openid-configuration.json
+      - path: /.well-known/oauth-authorization-server
+        status: 200
+        type: application/json
+        file: rose-rocket-oauth-authorization-server.json
+        note: Byte-identical to the openid-configuration document.
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://www.roserocket.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+      - path: /llms.txt
+        status: 404
+  - host: https://roserocket.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://network.roserocket.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://platform.roserocket.com
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+      - path: /.well-known/openid-configuration
+        status: 404
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404
+  - host: https://roserocket.readme.io
+    documents:
+      - path: /llms.txt
+        status: 200
+        type: text/plain
+        file: ../llms/rose-rocket-llms.txt
+      - path: /.well-known/security.txt
+        status: 404
+        note: Returns the ReadMe 404 HTML shell.
+      - path: /.well-known/api-catalog
+        status: 404
+      - path: /.well-known/ai-plugin.json
+        status: 404
+      - path: /.well-known/agent-card.json
+        status: 404
+      - path: /.well-known/agent.json
+        status: 404

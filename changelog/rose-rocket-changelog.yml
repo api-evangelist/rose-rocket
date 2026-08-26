@@ -1,0 +1,43 @@
+generated: '2026-08-26'
+method: searched
+source: https://roserocket.readme.io/changelog
+description: >-
+  Rose Rocket runs a changelog section on its ReadMe developer hub. It is real
+  and it is linked from the provider's own llms.txt, but it holds exactly TWO
+  entries, both written on 2025-01-07 when the hub launched, and neither
+  describes an API change. In the nineteen months since, no dated API change has
+  been posted — while the Platform Model API's own npm client and the CLI both
+  shipped new versions. Record this as a changelog that EXISTS and is NOT
+  MAINTAINED, which is a different fact from having none.
+docs: https://roserocket.readme.io/changelog
+versioning:
+  scheme: path-based major version
+  current: v2
+  detail: >-
+    The Platform Model API is served under /api/v2/platformModel; an earlier v1
+    surface (/api/v1) is still referenced by the Authentication Guide's sample
+    request. No version header, no dated versions, no published version-negotiation
+    mechanism. See lifecycle/rose-rocket-lifecycle.yml.
+entry_count: 2
+entries:
+  - title: Platform API Release
+    url: https://roserocket.readme.io/changelog/platform-api-release
+    date: '2025-01-07'
+    breaking: false
+    additions: false
+    highlights:
+      - Announces the release of the Platform API documentation hub itself, and the introduction of this changelog section.
+  - title: Welcome to RoseRocket
+    url: https://roserocket.readme.io/changelog/welcome-to-roserocket
+    date: '2025-01-07'
+    breaking: false
+    additions: false
+    highlights:
+      - Hub welcome post. No API content.
+gap:
+  last_entry: '2025-01-07'
+  checked: '2026-08-26'
+  note: >-
+    19 months with no changelog entry. Over the same window @roserocket-sdk/rock-cli
+    went to 1.2.16 (2026-06-29) and @roserocket-sdk/primitives to 3.1.0 (2026-08-24),
+    so the platform did change; the changelog did not record it.

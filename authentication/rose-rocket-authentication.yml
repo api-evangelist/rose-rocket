@@ -1,0 +1,90 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide,
+  https://roserocket.readme.io/docs/application-lifecycle-management,
+  https://roserocket.readme.io/docs/getting-started, and the live discovery
+  document at https://a.roserocket.com/.well-known/openid-configuration (HTTP 200,
+  probed 2026-08-26).
+description: >-
+  Rose Rocket authenticates every Platform API request with an OAuth 2.0 bearer
+  access token issued by a.roserocket.com, an Auth0-hosted authorization server
+  that publishes a full OIDC discovery document. Two documented paths exist:
+  the authorization-code flow for applications acting on behalf of an end user,
+  and a client-credentials "service account" flow for machine-to-machine access.
+  NOTE THE GAP: the published OpenAPI (openapi/rose-rocket-platform-model-api.json)
+  declares NO components.securitySchemes and NO security requirement on any of its
+  19 operations. The auth model below is real but lives only in prose — a client
+  generated from the spec alone would emit unauthenticated requests. The overlay
+  in overlays/ records this as our enhancement without mutating the original.
+authorization_server: https://a.roserocket.com/
+discovery:
+  openid_configuration: https://a.roserocket.com/.well-known/openid-configuration
+  oauth_authorization_server: https://a.roserocket.com/.well-known/oauth-authorization-server
+  jwks_uri: https://a.roserocket.com/.well-known/jwks.json
+  saved: well-known/rose-rocket-openid-configuration.json
+endpoints:
+  authorization: https://a.roserocket.com/authorize
+  token: https://a.roserocket.com/oauth/token
+  userinfo: https://a.roserocket.com/userinfo
+  revocation: https://a.roserocket.com/oauth/revoke
+  device_authorization: https://a.roserocket.com/oauth/device/code
+  registration: https://a.roserocket.com/oidc/register
+  end_session: https://a.roserocket.com/oidc/logout
+schemes:
+  - id: oauth2-authorization-code
+    type: oauth2
+    flow: authorizationCode
+    in: header
+    header: 'Authorization: Bearer <access_token>'
+    audience: https://roserocket.com
+    scopes_requested: [offline_access, email, profile]
+    parameters: [audience, response_type=code, client_id, redirect_uri, scope, state]
+    pkce: supported (code_challenge_methods_supported = S256, plain)
+    docs: https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide
+    note: >-
+      End-user consent flow. The user authenticates against a social connection or
+      a customer-configured third-party IdP (the guide names Azure Active Directory);
+      configuring an IdP requires contacting Rose Rocket.
+  - id: oauth2-client-credentials-service-account
+    type: oauth2
+    flow: clientCredentials
+    in: header
+    header: 'Authorization: Bearer <access_token>'
+    audience: https://roserocket.com
+    extra_parameters: [org_id, user_id]
+    docs: https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide
+    note: >-
+      Machine-to-machine. A Service Account user is created under the org and bound
+      to the OAuth application; the token request carries org_id and the service
+      account's user_id alongside client_id/client_secret. The service account
+      defaults to the Manager role — see the roles model in
+      https://roserocket.readme.io/docs/roles-and-permissions.
+token:
+  type: JWT bearer
+  lifetime: >-
+    Short-lived and deliberately unspecified. The Authentication Guide states
+    sessions "may expire sooner than expected" and that the timing "may vary as we
+    continuously improve our security systems"; clients must detect 401 and refresh.
+    A separate Getting Started page states access tokens last a maximum of 24 hours.
+  refresh: >-
+    grant_type=refresh_token against https://a.roserocket.com/oauth/token with
+    client_id, client_secret, refresh_token and org_id.
+  expiry_signal: HTTP 401
+credentials:
+  issuance: >-
+    NOT self-serve. Credentials are provisioned by Rose Rocket: existing customers
+    obtain API access through their account representative; independent software
+    vendors go through the Partnership team. An OAuth application is then created
+    in-product under Settings > API Settings > Applications > OAuth Applications.
+  fields: [client_id, client_secret, redirect_uris]
+  rotation: >-
+    Client secrets are rotatable in-product (Rotate Secret). Rotation invalidates the
+    previous secret immediately with no overlap window.
+    Source: https://roserocket.readme.io/docs/application-lifecycle-management
+  deletion: >-
+    Deleting an OAuth application is irreversible and immediately revokes that
+    application's API access.
+mtls: false
+api_keys: false
+api_keys_note: No API-key scheme is documented. All access is OAuth 2.0 bearer.

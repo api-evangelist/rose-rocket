@@ -1,0 +1,63 @@
+# RoseRocket Documentation
+
+> Documentation for RoseRocket
+
+Append .md to any documentation page URL to get its markdown version.
+
+## Guides
+- [Getting Started with the Rose Rocket API](https://roserocket.readme.io/docs/getting-started.md): Learn more about Rose Rocket’s API in this walkthrough to get started.
+- [Authentication Guide](https://roserocket.readme.io/docs/rose-rocket-api-oauth-20-authentication-guide.md)
+- [Application lifecycle management](https://roserocket.readme.io/docs/application-lifecycle-management.md): Learn more about managing your applications in Rose Rocket.
+- [Using Boards in Rose Rocket](https://roserocket.readme.io/docs/using-boards-in-rose-rocket.md): Learn about customizing your displayed information on the Rose Rocket user interface.
+- [Object Descriptions & Operations](https://roserocket.readme.io/docs/object-descriptions-and-operations.md)
+- [Upserts and External IDs](https://roserocket.readme.io/docs/upserts-and-external-ids.md)
+- [Webhooks](https://roserocket.readme.io/docs/webhooks-2.md)
+- [Object Builder](https://roserocket.readme.io/docs/object-builder.md)
+- [Roles and Permissions](https://roserocket.readme.io/docs/roles-and-permissions.md): Learn about roles and permissions and how to manage them in Rose Rocket.
+- [Address](https://roserocket.readme.io/docs/address.md)
+- [Customer](https://roserocket.readme.io/docs/customer.md)
+- [Task](https://roserocket.readme.io/docs/task.md)
+- [Stop](https://roserocket.readme.io/docs/stop-2.md)
+- [Manifest](https://roserocket.readme.io/docs/manifest-1.md)
+- [Order](https://roserocket.readme.io/docs/order.md)
+- [Commodities](https://roserocket.readme.io/docs/commodities.md)
+- [Partners](https://roserocket.readme.io/docs/partners.md)
+- [Financial Line Items](https://roserocket.readme.io/docs/financial-line-items.md)
+- [Quotes](https://roserocket.readme.io/docs/quotes.md)
+- [Contacts](https://roserocket.readme.io/docs/contacts.md)
+- [Tags](https://roserocket.readme.io/docs/tags.md)
+- [Assets](https://roserocket.readme.io/docs/assets.md)
+- [Invoices](https://roserocket.readme.io/docs/invoices.md)
+- [Bills](https://roserocket.readme.io/docs/bills.md): Verify and track costs for your Partners with bills.
+- [Document](https://roserocket.readme.io/docs/document.md)
+- [Pay Stubs](https://roserocket.readme.io/docs/pay-stubs.md)
+- [Tax Rate and Tax Rate Components](https://roserocket.readme.io/docs/tax-rate-and-tax-rate-components.md)
+- [Tax Rule](https://roserocket.readme.io/docs/tax-rule.md)
+- [Documents](https://roserocket.readme.io/docs/documents.md): Learn about documents in Rose Rocket as generated from objects and your own uploaded documents.
+- [Fuel, Zones, and Tariffs](https://roserocket.readme.io/docs/fuel-zones-and-tariffs.md)
+- [G/L Accounts](https://roserocket.readme.io/docs/gl-account.md)
+
+## API Reference
+- [List boards.](https://roserocket.readme.io/reference/get_boards-nav.md)
+- [List events for a given record.](https://roserocket.readme.io/reference/get_events.md)
+- [Create an event.](https://roserocket.readme.io/reference/post_events.md)
+- [List user groups](https://roserocket.readme.io/reference/listusergroups.md): Retrieves a list of all user groups belonging to the org.
+- [Create user group](https://roserocket.readme.io/reference/createusergroup.md): Creates a new user group and returns the result.
+- [List group members](https://roserocket.readme.io/reference/listusergroupmembers.md): Lists the users belonging to the indicated group.
+- [Add or remove group members](https://roserocket.readme.io/reference/addusergroupmembers.md): Adds or removes users to/from the indicated user group.  **NOTE:** Removal takes prescendence over addition so if a user ID appears on both the `add` and `remove` collection, then that user will *NOT* be a member of the user group after the operation completes.
+- [Search user groups](https://roserocket.readme.io/reference/post_usergroups-search.md)
+- [Returns a record by ID.](https://roserocket.readme.io/reference/get_objects-recordid.md)
+- [Update a record.](https://roserocket.readme.io/reference/put_objects-recordid.md)
+- [Delete a record.](https://roserocket.readme.io/reference/delete_objects-recordid.md)
+- [Upsert a record by external id.](https://roserocket.readme.io/reference/patch_objects.md)
+- [Create a record.](https://roserocket.readme.io/reference/post_objects.md)
+- [Upsert a record by object key and external id.](https://roserocket.readme.io/reference/patch_objects-objectkey-externalid-external.md)
+- [Delete a record with type objectKey by externalId.](https://roserocket.readme.io/reference/delete_objects-objectkey-externalid-external.md)
+- [Get a record with type objectKey by externalId.](https://roserocket.readme.io/reference/get_objects-objectkey-externalid-external.md)
+- [Bulk delete records.](https://roserocket.readme.io/reference/post_objects-bulk-delete.md)
+- [List records.](https://roserocket.readme.io/reference/post_objects-search.md)
+- [Returns a list of records matching search term](https://roserocket.readme.io/reference/get_objects-autocomplete.md)
+
+## Changelog
+- [Platform API Release](https://roserocket.readme.io/changelog/platform-api-release.md)
+- [Welcome to RoseRocket](https://roserocket.readme.io/changelog/welcome-to-roserocket.md)

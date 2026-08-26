@@ -1,0 +1,1382 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Rose Rocket Platform Model API",
+    "version": "1.0.0",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "https://example-org.roserocket.com/api/v2/platformModel",
+      "description": "Your organization's hostname with customized subdomain, e.g. \"example-org\"."
+    },
+    {
+      "url": "https://roserocket.com/api/v2/platformModel",
+      "description": "Generic hostname without a customized subdomain."
+    }
+  ],
+  "paths": {
+    "/boards/nav": {
+      "get": {
+        "summary": "List boards.",
+        "tags": [
+          "Boards"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BoardFindNavItemsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the found records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The requested page of results",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "description": "Use this is the \"boardId\" referenced in the object record service and elsewhere."
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "icon": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "objectKey": {
+                        "type": "string"
+                      },
+                      "createdAt": {
+                        "type": "string"
+                      },
+                      "isExternal": {
+                        "type": "boolean"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events": {
+      "get": {
+        "summary": "List events for a given record.",
+        "tags": [
+          "Events"
+        ],
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "query",
+            "required": true,
+            "description": "Record to fetch events for.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "boardId",
+            "in": "query",
+            "required": false,
+            "description": "The board the record belongs to.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "objectKey",
+            "in": "query",
+            "required": true,
+            "description": "The object key of the record.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "required": false,
+            "description": "Fetches events of this type.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "create",
+                "mutate",
+                "internal",
+                "widget-open",
+                "widget-close"
+              ]
+            }
+          },
+          {
+            "name": "inTypes",
+            "in": "query",
+            "required": false,
+            "description": "Fetches events in the list of provided types.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "notInTypes",
+            "in": "query",
+            "required": false,
+            "description": "Excludes events in the list of provided types.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "userId",
+            "in": "query",
+            "required": false,
+            "description": "Only fetches events created by this user.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "orderBy",
+            "in": "query",
+            "required": false,
+            "description": "The field to order the results by. Default is `createdAt`.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "createdAt",
+                "id",
+                "type",
+                "refId",
+                "ownerId"
+              ]
+            }
+          },
+          {
+            "name": "orderByDirection",
+            "in": "query",
+            "required": false,
+            "description": "The direction to order the results by.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "The number of results to fetch per page. Default is 200.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 200
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "The offset to start fetching results from. Default is 0.",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "bookmark",
+            "in": "query",
+            "required": false,
+            "description": "The bookmark (event id) to start fetching results from. If provided, `offset` and `limit` will start from the bookmark.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the found records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number",
+                      "description": "The approximate number of results"
+                    },
+                    "results": {
+                      "description": "The requested page of results",
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JSONRecord"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create an event.",
+        "tags": [
+          "Events"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the created record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/userGroups": {
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "summary": "List user groups",
+        "description": "Retrieves a list of all user groups belonging to the org.",
+        "operationId": "listUserGroups",
+        "responses": {
+          "200": {
+            "description": "List was successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserGroup"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/GroupUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/GroupForbiddenResponse"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User Groups"
+        ],
+        "summary": "Create user group",
+        "description": "Creates a new user group and returns the result.",
+        "operationId": "createUserGroup",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdateUserGroup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New user group was successfully created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGroup"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/GroupValidationError"
+          },
+          "401": {
+            "$ref": "#/components/responses/GroupUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/GroupForbiddenResponse"
+          },
+          "409": {
+            "$ref": "#/components/responses/GroupNameConflict"
+          }
+        }
+      }
+    },
+    "/userGroups/{groupId}/members": {
+      "get": {
+        "tags": [
+          "User Groups"
+        ],
+        "summary": "List group members",
+        "description": "Lists the users belonging to the indicated group.",
+        "operationId": "listUserGroupMembers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/GroupId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of group members was successfully returned.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "userIds"
+                  ],
+                  "properties": {
+                    "members": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "id"
+                        ],
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "ID of the user."
+                          },
+                          "addedAt": {
+                            "type": "string",
+                            "format": "date-time",
+                            "description": "Date/time the user was added to the group."
+                          },
+                          "addedBy": {
+                            "type": "string",
+                            "description": "Name of the user who added the user to the group."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/GroupUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/GroupForbiddenResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/GroupNotFound"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "User Groups"
+        ],
+        "summary": "Add or remove group members",
+        "description": "Adds or removes users to/from the indicated user group.\n\n**NOTE:** Removal takes prescendence over addition so if a user ID appears on both the `add` and `remove` collection,\nthen that user will *NOT* be a member of the user group after the operation completes.\n",
+        "operationId": "addUserGroupMembers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/GroupId"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "add": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the user to add to the user group."
+                    }
+                  },
+                  "remove": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid",
+                      "description": "ID of the user to remove from the user group."
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User group memberships were successfully updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "added",
+                    "removed"
+                  ],
+                  "properties": {
+                    "added": {
+                      "type": "number",
+                      "format": "int32",
+                      "example": 12,
+                      "description": "Number of users added to the user group."
+                    },
+                    "removed": {
+                      "type": "number",
+                      "format": "int32",
+                      "example": 4,
+                      "description": "Number of users removed from the user group."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/GroupUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/GroupForbiddenResponse"
+          },
+          "404": {
+            "$ref": "#/components/responses/GroupNotFound"
+          }
+        }
+      }
+    },
+    "/userGroups/search": {
+      "post": {
+        "tags": [
+          "User Groups"
+        ],
+        "summary": "Search user groups",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SearchGroupsDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Search results were successfully retrieved.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number",
+                      "description": "The total number of groups"
+                    },
+                    "results": {
+                      "type": "array",
+                      "description": "The requested page of results",
+                      "items": {
+                        "$ref": "#/components/schemas/UserGroup"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/GroupUnauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/GroupForbiddenResponse"
+          }
+        }
+      }
+    },
+    "/objects/{recordId}": {
+      "get": {
+        "summary": "Returns a record by ID.",
+        "tags": [
+          "Object Records"
+        ],
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "paths",
+            "in": "query",
+            "description": "Comma separated list of period delimited paths denoting additional attributes to return. If omitted, only-top level primitive fields will be returned.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "boardId",
+            "in": "query",
+            "description": "The board ID that this request is relative to.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "isDetailView",
+            "in": "query",
+            "description": "If included, will add all fields that record's detail view confuration is dependent on.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the record with top-level primitive fields populated. See also the schema for the object requested.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a record.",
+        "tags": [
+          "Object Records"
+        ],
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectRecordUpdateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the updated record with top-level primitive and nested updated fields populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a record.",
+        "tags": [
+          "Object Records"
+        ],
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "boardId",
+            "in": "query",
+            "description": "The board ID that this request is relative to.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the deleted record with top-level primitive fields populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects": {
+      "patch": {
+        "summary": "Upsert a record by external id.",
+        "tags": [
+          "Object Records"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectRecordUpsertRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the updated record with top-level primitive and nested updated fields populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Returns the created record.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a record.",
+        "tags": [
+          "Object Records"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectRecordCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the created record with top-level primitive and nested created fields populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects/{objectKey}/{externalId}/external": {
+      "patch": {
+        "summary": "Upsert a record by object key and external id.",
+        "tags": [
+          "Object Records"
+        ],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "objectKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectRecordUpsertRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the object record with top-level primitive fields populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a record with type objectKey by externalId.",
+        "tags": [
+          "Object Records"
+        ],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "objectKey",
+            "in": "path",
+            "required": true,
+            "description": "The type of the record. Determines which schema this is.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the deleted record with top-level primitive fields populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get a record with type objectKey by externalId.",
+        "tags": [
+          "Object Records"
+        ],
+        "parameters": [
+          {
+            "name": "externalId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "objectKey",
+            "in": "path",
+            "required": true,
+            "description": "The type of the record. Determines which schema this is.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the object record with top-level primitive fields populated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects/bulk_delete": {
+      "post": {
+        "summary": "Bulk delete records.",
+        "tags": [
+          "Object Records"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectRecordBulkDeleteRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "The records have been successfully deleted"
+          }
+        }
+      }
+    },
+    "/objects/search": {
+      "post": {
+        "summary": "List records.",
+        "tags": [
+          "Object Records"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObjectRecordSearchRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns the found records.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "total": {
+                      "type": "number",
+                      "description": "The approximate number of results"
+                    },
+                    "results": {
+                      "description": "The requested page of results",
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/JSONRecord"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/objects/autocomplete": {
+      "get": {
+        "summary": "Returns a list of records matching search term",
+        "tags": [
+          "Object Records"
+        ],
+        "parameters": [
+          {
+            "name": "objectKey",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "searchTerm",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "labelPath",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of records by object key for use in autocompletes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JSONRecord"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BoardFindNavItemsRequest": {
+        "type": "object",
+        "properties": {
+          "orderBy": {
+            "type": "object"
+          },
+          "orderByDirection": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "objectKey": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        }
+      },
+      "EventCreateRequest": {
+        "type": "object",
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "description": "The record to get events for"
+          },
+          "boardId": {
+            "type": "string",
+            "description": "The board this record is being accessed through."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "create",
+              "mutate",
+              "internal",
+              "widget-open",
+              "widget-close"
+            ]
+          },
+          "json": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "recordId",
+          "boardId",
+          "type",
+          "json"
+        ]
+      },
+      "CreateOrUpdateUserGroup": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the user group as it will appear in the UI.",
+            "example": "Admins"
+          },
+          "description": {
+            "type": "string",
+            "example": "Has administrative access to the org",
+            "description": "An optional text description of the user group."
+          }
+        }
+      },
+      "UserGroup": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The globally-unique ID that identifies the user group."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the user group as it will appear in the UI.",
+            "example": "Admins"
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of user group. (I.e. local, Active Directory, etc.)",
+            "enum": [
+              "local"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "example": "Has administrative access to the org",
+            "description": "An optional text description of the user group."
+          }
+        }
+      },
+      "SearchGroupsDTO": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the user group(s).",
+            "example": "Admins"
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "limit": {
+            "type": "number"
+          },
+          "offset": {
+            "type": "number"
+          }
+        }
+      },
+      "JSONRecord": {
+        "description": "All records extend from this structure",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Globally unique identifier for this record"
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "The type of the record. Determines the other possible fields of this record and determines which schema this is."
+          }
+        }
+      },
+      "ObjectRecordBulkDeleteRequest": {
+        "type": "object",
+        "properties": {
+          "boardId": {
+            "type": "string",
+            "description": "The board this record is being accessed through."
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "The type of the record."
+          },
+          "ids": {
+            "description": "The IDs of the records to be deleted",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ObjectRecordCreateRequest": {
+        "type": "object",
+        "properties": {
+          "json": {
+            "type": "object",
+            "description": "Optional initial values"
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "The type of the record. Determines the other possible fields of this record and determines which schema this is."
+          },
+          "paths": {
+            "type": "array",
+            "description": "Additional paths to return."
+          }
+        }
+      },
+      "ObjectRecordUpsertRequest": {
+        "type": "object",
+        "properties": {
+          "json": {
+            "type": "object",
+            "description": "The fields to update or initialize"
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "The type of the record. Determines the other possible fields of this record and determines which schema this is."
+          },
+          "paths": {
+            "type": "array",
+            "description": "Additional paths to return."
+          }
+        },
+        "required": [
+          "objectKey"
+        ]
+      },
+      "ObjectRecordUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "boardId": {
+            "type": "string",
+            "description": "The board this record is being accessed through."
+          },
+          "json": {
+            "type": "object",
+            "description": "The fields to update, included related records. Only fields to be changed should be provided."
+          },
+          "paths": {
+            "type": "array",
+            "description": "Additional paths to return."
+          },
+          "objectKey": {
+            "type": "string",
+            "description": "Object key of the record to update."
+          }
+        },
+        "required": [
+          "json",
+          "objectKey"
+        ]
+      },
+      "ObjectRecordSearchRequest": {
+        "type": "object",
+        "properties": {
+          "boardId": {
+            "type": "string",
+            "description": "The board this record is being accessed through."
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Timezone of the caller."
+          },
+          "filters": {
+            "type": "array",
+            "description": "The filters."
+          },
+          "filtersOperator": {
+            "type": "string"
+          },
+          "orderByPath": {
+            "type": "string"
+          },
+          "orderByDirection": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "boardId"
+        ]
+      }
+    },
+    "parameters": {
+      "GroupId": {
+        "name": "groupId",
+        "in": "path",
+        "description": "The ID of the user group.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    },
+    "responses": {
+      "GroupNotFound": {
+        "description": "The operation could not be completed because the requested groupId could not be found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "number",
+                  "example": 404
+                },
+                "message": {
+                  "type": "string",
+                  "example": "User group with ID \"XXXXX\" not found."
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Not Found"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GroupUnauthorized": {
+        "description": "The action could not be completed because the call was not made with a valid JWT identifying the calling user or application.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "number",
+                  "example": 401
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Action is unauthorized."
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GroupForbiddenResponse": {
+        "description": "The action could not be performed on the indicated user group(s) because the caller does not have sufficient permission.\nUsers require the `userGroupResource` permission scope.\n* Viewer-level permission is required for listing, fetching, and viewing membership of user groups.\n* Editor-level permission is required for updating, deleting, and modifying membership of user groups.\n",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "number",
+                  "example": 403
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Action is forbidden."
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Forbidden"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GroupNameConflict": {
+        "description": "The group could not be created or renamed because a group already exists with the name provided.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "number",
+                  "example": 409
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Group name is already in use."
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Conflict"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GroupValidationError": {
+        "description": "The new group could not be created because there was a problem validating the request body.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "required": [
+                "statusCode",
+                "message",
+                "error"
+              ],
+              "properties": {
+                "statusCode": {
+                  "type": "number",
+                  "example": 400
+                },
+                "message": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "example": "name should not be empty"
+                  }
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Bad Request"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": [],
+  "x-readme": {
+    "explorer-enabled": true,
+    "proxy-enabled": true
+  }
+}

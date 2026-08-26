@@ -1,0 +1,69 @@
+generated: '2026-08-26'
+method: generated
+source: >-
+  Authored by API Evangelist from openapi/rose-rocket-platform-model-api.json and the
+  Rose Rocket documentation fetched 2026-08-26. Searched first for provider-published
+  skills or an AGENTS.md — none exists: https://roserocket.readme.io/llms.txt (the
+  provider's own complete page index) lists no skills, agent or MCP page, and
+  github.com/RoseRocketSDK has no public repositories.
+provider_published: false
+description: >-
+  Packaged Agent Skills for the Rose Rocket Platform Model API. Every operation named
+  in these skills was read out of the published OpenAPI; none is invented. The skills
+  concentrate on the four things an agent gets wrong on this API: it is a generic
+  object API with no domain schema, its only idempotency mechanism is externalId, its
+  scopes grant nothing, and its deletes cannot be undone.
+api: Rose Rocket Platform Model API
+base_url: https://network.roserocket.com/api/v2/platformModel
+skills:
+  - name: rose-rocket-authenticate
+    file: rose-rocket-authenticate.md
+    summary: >-
+      Get and refresh an OAuth 2.0 token by authorization code or by client-credentials
+      service account, and understand why the scopes grant no API permission.
+    operations: []
+    covers: [authentication, token refresh, credential rotation, role-based authorization]
+  - name: rose-rocket-sync-external-records
+    file: rose-rocket-sync-external-records.md
+    summary: >-
+      Upsert by externalId — the retry-safe write path, and the only idempotency
+      mechanism this API has.
+    operations:
+      - PATCH /objects
+      - PATCH /objects/{objectKey}/{externalId}/external
+      - GET /objects/{objectKey}/{externalId}/external
+    covers: [idempotency, external ids, connected objects, error handling]
+  - name: rose-rocket-order-to-cash
+    file: rose-rocket-order-to-cash.md
+    summary: >-
+      Customer to order to manifest to financial line items to invoice, through the
+      generic object operations, with the entity graph made explicit.
+    operations:
+      - POST /objects
+      - GET /objects/{recordId}
+      - PUT /objects/{recordId}
+      - POST /objects/search
+      - GET /objects/autocomplete
+    covers: [entity graph, path expansion, board-scoped search, pagination limits, read-only derived fields]
+  - name: rose-rocket-receive-webhooks
+    file: rose-rocket-receive-webhooks.md
+    summary: >-
+      Register a webhook destination as a record, handle an unsigned at-least-once
+      delivery, and reconcile a lost one.
+    operations:
+      - POST /objects
+      - GET /objects/{recordId}
+      - GET /events
+    covers: [webhook registration, delivery envelope, retry policy, unsigned deliveries, gap reconciliation]
+grounding:
+  openapi: openapi/rose-rocket-platform-model-api.json
+  overlay: overlays/rose-rocket-platform-model-api-overlay.yaml
+  conventions: conventions/rose-rocket-conventions.yml
+  errors: errors/rose-rocket-problem-types.yml
+  data_model: data-model/rose-rocket-data-model.yml
+  webhooks: asyncapi/rose-rocket-webhooks.yml
+  authentication: authentication/rose-rocket-authentication.yml
+  scopes: scopes/rose-rocket-scopes.yml
+not_covered:
+  - No skill is written for the roles-and-permissions write endpoint. It is documented in prose but absent from the contract, and its schema has not been verified against a live call.
+  - No skill covers rating, tariffs or fuel tables. Those objects have reference pages but no operations beyond generic CRUD, and no worked example is published.

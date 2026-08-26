@@ -1,0 +1,241 @@
+generated: '2026-08-26'
+method: searched
+source: >-
+  https://roserocket.readme.io/docs/object-descriptions-and-operations,
+  https://roserocket.readme.io/docs/upserts-and-external-ids,
+  https://roserocket.readme.io/docs/getting-started,
+  https://roserocket.readme.io/docs/webhooks-2,
+  https://roserocket.readme.io/docs/roles-and-permissions (all fetched 2026-08-26,
+  HTTP 200 via the .md rendering the provider's own llms.txt advertises), plus
+  parameters and components.responses read from
+  openapi/rose-rocket-platform-model-api.json.
+description: >-
+  Cross-cutting runtime semantics for the Rose Rocket Platform Model API. The
+  defining convention is that this is a GENERIC OBJECT API: one set of /objects
+  operations serves every domain entity, and the `objectKey` field in the payload
+  (or path) selects which one. That makes the surface small and uniform, and it
+  moves the entire domain schema out of the contract — the OpenAPI models a record
+  as `JSONRecord { id, objectKey }` with a free-form `json` bag, so no client or
+  agent can validate a customer, order or invoice payload against the published
+  spec. Field-level truth lives in prose object-reference pages.
+auth:
+  style: OAuth 2.0 bearer token
+  header: 'Authorization: Bearer <access_token>'
+  detail: See authentication/rose-rocket-authentication.yml and scopes/rose-rocket-scopes.yml.
+  in_spec: false
+  in_spec_note: The OpenAPI declares no securitySchemes and no security requirement on any operation.
+base_url:
+  documented: https://network.roserocket.com/api/v2/platformModel
+  documented_source: https://roserocket.readme.io/docs/object-descriptions-and-operations
+  spec_servers:
+    - https://example-org.roserocket.com/api/v2/platformModel
+    - https://roserocket.com/api/v2/platformModel
+  note: >-
+    A live disagreement, recorded rather than repaired. The OpenAPI servers[] block
+    offers a per-organization subdomain template (example-org.roserocket.com) and a
+    generic roserocket.com host; every worked example in the docs — Getting Started,
+    Object Operations, Webhooks — uses network.roserocket.com, while the Upserts
+    guide uses a third form (xyzfreightcorp.roserocket.com). The per-org subdomain
+    and network.roserocket.com both appear to be real; nothing published says which
+    an integration should prefer. The original spec is left untouched; the overlay
+    in overlays/ carries our annotation.
+content_type:
+  request: application/json
+  response: application/json
+object_model:
+  selector: objectKey
+  selector_note: >-
+    Every write carries {"objectKey": "<type>", "json": {...}}. The same /objects
+    endpoints serve customer, order, task, address, commodity, manifest, partner,
+    quote, financialLineItem, invoice, bill, tag, asset, contact, taxRate, taxRule,
+    payStub, document, webhookDestination and webhookSubscription.
+  envelope: >-
+    Responses are the record itself, not a wrapper. Every record carries id,
+    objectKey, orgId, source, fullId, externalId, createdAt, createdBy, updatedAt,
+    updatedBy and version.
+  identifiers:
+    primary: id — a UUID, globally unique across the platform.
+    human: fullId — a human-readable per-org sequence, e.g. CUST-9, O-19, M-O-19.
+    external: externalId — caller-owned; the upsert key. Nullable.
+  connected_objects: >-
+    Related records are "connected objects". They are omitted from a default GET and
+    fetched by naming them in the `paths` query parameter (comma separated), e.g.
+    ?paths=commodities,relatedCommodities,stops. Nested creates are supported: a
+    connected object included in a create payload is created with the parent.
+  read_only_fields: >-
+    Derived fields are immutable. The documented example is Invoice.subTotal, computed
+    from the connected financialLineItems.
+idempotency:
+  supported: partial
+  header: none
+  header_note: No Idempotency-Key (or equivalent) request header is documented or present in the spec.
+  mechanism: natural-key upsert on externalId
+  detail: >-
+    PATCH /objects with an externalId in the json body is idempotent by that key: if
+    no record carries the externalId a record is created (201), if one does it is
+    updated (200). The provider states plainly that this "is used to prevent
+    duplication during the insert operation", and it is the mechanism their own docs
+    prescribe for synchronising an external system into Rose Rocket. There is a second,
+    path-based form: PATCH /objects/{objectKey}/{externalId}/external.
+  limitation: >-
+    Upsert is explicitly NOT supported on POST. The docs say a POST attempting to
+    upsert against an existing externalId "will not be successful", and a retried
+    POST /objects with no externalId creates a duplicate record. An agent that must
+    retry a create safely has to set an externalId and use PATCH.
+  natural_idempotency:
+    - PUT /objects/{recordId} — full update, idempotent by recordId.
+    - DELETE /objects/{recordId} — idempotent; a second delete returns 404.
+    - PATCH /objects — idempotent when externalId is set.
+  scope: per organization (orgId), per objectKey, on the externalId value
+  retention: not documented
+pagination:
+  style: mixed
+  detail: >-
+    There is no single pagination convention. GET /events is the only operation with
+    a complete one; POST /objects/search caps a result set but publishes no way to
+    walk past the cap; the remaining list operations publish nothing.
+  operations:
+    - operation: GET /events
+      params: [limit, offset, bookmark, orderBy, orderByDirection]
+      style: offset + opaque bookmark
+    - operation: POST /objects/search
+      params: [limit, orderByPath, orderByDirection, filters, filtersOperator, boardId]
+      style: limit only
+      gap: No offset, cursor or page token. No total-count field is documented.
+    - operation: GET /objects/autocomplete
+      params: [objectKey, searchTerm, ids, labelPath]
+      style: none
+    - operation: GET /userGroups
+      params: []
+      style: none
+  response_fields: not documented
+field_selection:
+  style: path expansion
+  param: paths
+  detail: >-
+    `paths` is a comma-separated list of connected objects to include, on GET
+    /objects/{recordId} and in create/update/upsert request bodies. It expands the
+    response; there is no sparse-fieldset parameter to narrow it.
+  board_context: >-
+    Several operations take a boardId. A board is a saved view, and it is also a
+    permission boundary — what a role may see through a board is configurable — so
+    the same record can render differently depending on the boardId supplied.
+metadata:
+  custom_fields: >-
+    Custom fields are a first-class product feature (the pricing page markets
+    "1 minute custom fields"), configured through the Object Builder. They surface on
+    the record as ordinary keys inside `json`. There is no separate metadata map and
+    no documented API to enumerate an org's custom-field schema.
+request_id_tracing:
+  supported: not documented
+  detail: >-
+    No request-id or correlation header is documented on requests or responses, and
+    none appears in the spec. Webhook DELIVERIES do carry an event `id`, and the
+    product keeps 7 days of webhook receipts, but that is an event identifier rather
+    than a request trace.
+versioning:
+  style: path-based major version
+  current: v2
+  path: /api/v2/platformModel
+  previous: /api/v1 — still referenced in the Authentication Guide's example call to /api/v1/me.
+  headers: none
+  negotiation: none documented
+  detail: See lifecycle/rose-rocket-lifecycle.yml.
+error_envelope:
+  format: custom
+  rfc9457: false
+  media_type: application/json
+  shape: '{ "statusCode": <number>, "message": <string | string[]>, "error": <string> }'
+  note: >-
+    A NestJS-style envelope, consistent across the spec's declared error responses and
+    the docs' error tables. `message` is a string for most errors and an ARRAY of
+    strings for 400 validation failures, which a strict client must handle. No error
+    code vocabulary, no type URI, no field pointer. See
+    errors/rose-rocket-problem-types.yml.
+rate_limit_signaling:
+  headers: none documented
+  status_on_exhaustion: not documented
+  detail: See rate-limits/rose-rocket-rate-limits.yml — no published limits and no documented headers.
+dry_run_mode:
+  supported: false
+  note: >-
+    No dry-run, preview, validate-only or simulate parameter is documented on any
+    write operation, and no sandbox or test-mode environment is published.
+reversibility:
+  grade: none
+  graded_against: 'API Evangelist agent-readiness dimension 15 (0.12.0): reversal path documented = 0.4, reversal path + stated window = 1.0.'
+  write_surface: true
+  summary: >-
+    Rose Rocket publishes a full write surface — create, update, upsert, delete and
+    bulk delete across every business object in a freight operation, including
+    invoices and bills — and documents NO reversal operation for any of it. There is
+    no undo, no restore, no trash or soft-delete endpoint, no void or credit operation
+    on financial objects, and no retention window inside which a deleted record could
+    be recovered. The published record does carry an incrementing `version` and the
+    product markets a per-field audit trail, so the platform plainly retains history;
+    none of it is reachable through the API as a reversal. An agent calling
+    DELETE /objects/{recordId} must treat the call as final.
+  surfaces:
+    - operation: DELETE /objects/{recordId}
+      write: Deletes any record of any objectKey.
+      reversal: none documented
+      window: none stated
+      grade: none
+      evidence: https://roserocket.readme.io/docs/object-descriptions-and-operations
+    - operation: POST /objects/bulk_delete
+      write: Deletes many records by id array in one call. Returns 204.
+      reversal: none documented
+      window: none stated
+      grade: none
+      note: The highest-blast-radius operation in the contract, and the one with the least published safety.
+      evidence: openapi/rose-rocket-platform-model-api.json
+    - operation: DELETE /objects/{objectKey}/{externalId}/external
+      write: Deletes by caller-owned external id.
+      reversal: none documented
+      window: none stated
+      grade: none
+    - operation: PUT /objects/{recordId}
+      write: Full update of a record.
+      reversal: >-
+        No revert endpoint. A caller can re-PUT prior values only if it captured them
+        first; the API publishes no way to read a previous version.
+      window: none stated
+      grade: none
+    - operation: PATCH /objects (upsert)
+      write: Creates or updates by externalId.
+      reversal: none documented
+      window: none stated
+      grade: none
+      note: Re-running the same upsert is safe (idempotent), which is containment, not reversal.
+    - operation: POST /userGroups/{groupId}/members
+      write: Adds or removes group members in one call.
+      reversal: >-
+        Symmetric by construction — a removal is undone by an add on the same endpoint.
+        The docs state removal takes precedence over addition when a user id appears in
+        both collections.
+      window: 'not applicable: no window, the inverse call is always available'
+      grade: documented
+      evidence: https://roserocket.readme.io/reference/addusergroupmembers
+  adjacent_irreversible_actions:
+    - action: Deleting an OAuth application
+      surface: product UI (Settings > API Settings > Applications)
+      statement: '"Deleting an application cannot be undone." Immediately revokes that application''s API access.'
+      source: https://roserocket.readme.io/docs/application-lifecycle-management
+    - action: Rotating a client secret
+      surface: product UI
+      statement: The previous secret is invalid immediately after rotation, with no overlap window.
+      source: https://roserocket.readme.io/docs/application-lifecycle-management
+  status_transitions_note: >-
+    Several objects carry a `canceled` status (task: new, incomplete, inprogress,
+    assigned, complete, problem, canceled). Moving a record to a cancelled status is a
+    state change the API can make, not a documented reversal of a prior call, and no
+    docs state whether or when it can be moved back. Recorded here so it is not
+    mistaken for a reversal path.
+cross_links:
+  authentication: authentication/rose-rocket-authentication.yml
+  scopes: scopes/rose-rocket-scopes.yml
+  errors: errors/rose-rocket-problem-types.yml
+  lifecycle: lifecycle/rose-rocket-lifecycle.yml
+  rate_limits: rate-limits/rose-rocket-rate-limits.yml
+  webhooks: asyncapi/rose-rocket-webhooks.yml
+  data_model: data-model/rose-rocket-data-model.yml
