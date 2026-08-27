@@ -46,69 +46,145 @@ tags_raw:
   - oauth
   - canada
 apis:
-  - name: Rose Rocket Platform Model API
-    description: >-
-      The Platform Model API is Rose Rocket's single public REST surface. Rather than a
-      resource-per-endpoint design, it exposes 19 operations over a generic object model:
-      create, read, update, delete, upsert-by-external-id, bulk delete, search and
-      autocomplete against /objects, where the objectKey field in the payload selects the
-      domain object (customer, order, task, address, commodity, manifest, partner, quote,
-      financial line item, invoice, bill, tag, asset, contact, tax rate, webhook
-      destination). It also carries user-group management, board navigation and an event
-      surface. Webhook destinations and subscriptions are themselves configured through
-      the same /objects endpoint. All requests carry an OAuth 2.0 bearer token.
-    humanURL: https://roserocket.readme.io/reference
-    baseURL: https://network.roserocket.com/api/v2/platformModel
-    tags:
-      - Transportation
-      - Logistics
-      - Freight
-      - Trucking
-      - Transportation Management System
-      - Dispatch
-      - Webhooks
-      - OAuth
-    tags_raw:
-      - transportation
-      - logistics
-      - freight
-      - trucking
-      - transportation-management-system
-      - dispatch
-      - webhooks
-      - oauth
-    properties:
-      - type: OpenAPI
-        url: openapi/rose-rocket-platform-model-api.json
-      - type: Overlay
-        url: overlays/rose-rocket-platform-model-api-overlay.yaml
-      - type: Documentation
-        url: https://roserocket.readme.io/docs/getting-started
-      - type: APIReference
-        url: https://roserocket.readme.io/reference
-      - type: GettingStarted
-        url: https://roserocket.readme.io/docs/getting-started
-      - type: Authentication
-        url: authentication/rose-rocket-authentication.yml
-      - type: OAuthScopes
-        url: scopes/rose-rocket-scopes.yml
-      - type: Conventions
-        url: conventions/rose-rocket-conventions.yml
-      - type: Idempotency
-        url: conventions/rose-rocket-conventions.yml
-      - type: DataModel
-        url: data-model/rose-rocket-data-model.yml
-      - type: ErrorCatalog
-        url: errors/rose-rocket-problem-types.yml
-      - type: Webhooks
-        url: asyncapi/rose-rocket-webhooks.yml
-      - type: RateLimits
-        url: rate-limits/rose-rocket-rate-limits.yml
-      - type: Conformance
-        url: conformance/rose-rocket-conformance.yml
-      - type: AgentSkill
-        url: skills/_index.yml
+- aid: rose-rocket:rose-rocket-boards-api
+  name: Rose Rocket Boards API
+  description: The Boards API from Rose Rocket — 1 operation(s) for boards.
+  humanURL: https://roserocket.readme.io/reference
+  baseURL: https://network.roserocket.com/api/v2/platformModel
+  tags:
+  - Boards
+  properties:
+  - type: OpenAPI
+    url: openapi/rose-rocket-boards-api-openapi.yml
+  - type: Documentation
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: APIReference
+    url: https://roserocket.readme.io/reference
+  - type: GettingStarted
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/rose-rocket-authentication.yml
+  - type: OAuthScopes
+    url: scopes/rose-rocket-scopes.yml
+  - type: Conventions
+    url: conventions/rose-rocket-conventions.yml
+  - type: Idempotency
+    url: conventions/rose-rocket-conventions.yml
+  - type: DataModel
+    url: data-model/rose-rocket-data-model.yml
+  - type: ErrorCatalog
+    url: errors/rose-rocket-problem-types.yml
+  - type: Webhooks
+    url: asyncapi/rose-rocket-webhooks.yml
+  - type: RateLimits
+    url: rate-limits/rose-rocket-rate-limits.yml
+  - type: Conformance
+    url: conformance/rose-rocket-conformance.yml
+- aid: rose-rocket:rose-rocket-events-api
+  name: Rose Rocket Events API
+  description: The Events API from Rose Rocket — 1 operation(s) for events.
+  humanURL: https://roserocket.readme.io/reference
+  baseURL: https://network.roserocket.com/api/v2/platformModel
+  tags:
+  - Events
+  properties:
+  - type: OpenAPI
+    url: openapi/rose-rocket-events-api-openapi.yml
+  - type: Documentation
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: APIReference
+    url: https://roserocket.readme.io/reference
+  - type: GettingStarted
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/rose-rocket-authentication.yml
+  - type: OAuthScopes
+    url: scopes/rose-rocket-scopes.yml
+  - type: Conventions
+    url: conventions/rose-rocket-conventions.yml
+  - type: Idempotency
+    url: conventions/rose-rocket-conventions.yml
+  - type: DataModel
+    url: data-model/rose-rocket-data-model.yml
+  - type: ErrorCatalog
+    url: errors/rose-rocket-problem-types.yml
+  - type: Webhooks
+    url: asyncapi/rose-rocket-webhooks.yml
+  - type: RateLimits
+    url: rate-limits/rose-rocket-rate-limits.yml
+  - type: Conformance
+    url: conformance/rose-rocket-conformance.yml
+- aid: rose-rocket:rose-rocket-object-records-api
+  name: Rose Rocket Object Records API
+  description: The Object Records API from Rose Rocket — 6 operation(s) for object records.
+  humanURL: https://roserocket.readme.io/reference
+  baseURL: https://network.roserocket.com/api/v2/platformModel
+  tags:
+  - Object Records
+  properties:
+  - type: OpenAPI
+    url: openapi/rose-rocket-object-records-api-openapi.yml
+  - type: Documentation
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: APIReference
+    url: https://roserocket.readme.io/reference
+  - type: GettingStarted
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/rose-rocket-authentication.yml
+  - type: OAuthScopes
+    url: scopes/rose-rocket-scopes.yml
+  - type: Conventions
+    url: conventions/rose-rocket-conventions.yml
+  - type: Idempotency
+    url: conventions/rose-rocket-conventions.yml
+  - type: DataModel
+    url: data-model/rose-rocket-data-model.yml
+  - type: ErrorCatalog
+    url: errors/rose-rocket-problem-types.yml
+  - type: Webhooks
+    url: asyncapi/rose-rocket-webhooks.yml
+  - type: RateLimits
+    url: rate-limits/rose-rocket-rate-limits.yml
+  - type: Conformance
+    url: conformance/rose-rocket-conformance.yml
+- aid: rose-rocket:rose-rocket-user-groups-api
+  name: Rose Rocket User Groups API
+  description: The User Groups API from Rose Rocket — 3 operation(s) for user groups.
+  humanURL: https://roserocket.readme.io/reference
+  baseURL: https://network.roserocket.com/api/v2/platformModel
+  tags:
+  - User Groups
+  properties:
+  - type: OpenAPI
+    url: openapi/rose-rocket-user-groups-api-openapi.yml
+  - type: Documentation
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: APIReference
+    url: https://roserocket.readme.io/reference
+  - type: GettingStarted
+    url: https://roserocket.readme.io/docs/getting-started
+  - type: Authentication
+    url: authentication/rose-rocket-authentication.yml
+  - type: OAuthScopes
+    url: scopes/rose-rocket-scopes.yml
+  - type: Conventions
+    url: conventions/rose-rocket-conventions.yml
+  - type: Idempotency
+    url: conventions/rose-rocket-conventions.yml
+  - type: DataModel
+    url: data-model/rose-rocket-data-model.yml
+  - type: ErrorCatalog
+    url: errors/rose-rocket-problem-types.yml
+  - type: Webhooks
+    url: asyncapi/rose-rocket-webhooks.yml
+  - type: RateLimits
+    url: rate-limits/rose-rocket-rate-limits.yml
+  - type: Conformance
+    url: conformance/rose-rocket-conformance.yml
 common:
+  - type: Overlay
+    url: overlays/rose-rocket-platform-model-api-overlay.yaml
   - type: Website
     url: https://www.roserocket.com/
   - type: DeveloperPortal
