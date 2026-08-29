@@ -16,6 +16,18 @@ description: >-
   API access is not self-serve: credentials come from an account representative or the
   partnership team, and the pricing page lists "unlimited API access" as an Enterprise
   tier feature.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: true
+  label: Hosted service · you call their endpoint
+  confidence: high
+  source:
+  - openapi
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://framerusercontent.com/images/eevMW1fKr5iFYAXYwLYuO8Sp5PQ.jpg
 url: https://raw.githubusercontent.com/api-evangelist/rose-rocket/refs/heads/main/apis.yml
 x-type: company
