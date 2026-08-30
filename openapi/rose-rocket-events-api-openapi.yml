@@ -1,0 +1,186 @@
+openapi: 3.2.0
+info:
+  title: Rose Rocket Platform Model Events API
+  version: 1.0.0
+  description: ''
+servers:
+- url: https://example-org.roserocket.com/api/v2/platformModel
+  description: Your organization's hostname with customized subdomain, e.g. "example-org".
+- url: https://roserocket.com/api/v2/platformModel
+  description: Generic hostname without a customized subdomain.
+tags:
+- name: Events
+paths:
+  /events:
+    get:
+      summary: List events for a given record.
+      tags:
+      - Events
+      parameters:
+      - name: recordId
+        in: query
+        required: true
+        description: Record to fetch events for.
+        schema:
+          type: string
+          format: uuid
+      - name: boardId
+        in: query
+        required: false
+        description: The board the record belongs to.
+        schema:
+          type: string
+          format: uuid
+      - name: objectKey
+        in: query
+        required: true
+        description: The object key of the record.
+        schema:
+          type: string
+      - name: type
+        in: query
+        required: false
+        description: Fetches events of this type.
+        schema:
+          type: string
+          enum:
+          - create
+          - mutate
+          - internal
+          - widget-open
+          - widget-close
+      - name: inTypes
+        in: query
+        required: false
+        description: Fetches events in the list of provided types.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: notInTypes
+        in: query
+        required: false
+        description: Excludes events in the list of provided types.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: userId
+        in: query
+        required: false
+        description: Only fetches events created by this user.
+        schema:
+          type: string
+          format: uuid
+      - name: orderBy
+        in: query
+        required: false
+        description: The field to order the results by. Default is `createdAt`.
+        schema:
+          type: string
+          enum:
+          - createdAt
+          - id
+          - type
+          - refId
+          - ownerId
+      - name: orderByDirection
+        in: query
+        required: false
+        description: The direction to order the results by.
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+      - name: limit
+        in: query
+        required: false
+        description: The number of results to fetch per page. Default is 200.
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 200
+      - name: offset
+        in: query
+        required: false
+        description: The offset to start fetching results from. Default is 0.
+        schema:
+          type: integer
+      - name: bookmark
+        in: query
+        required: false
+        description: The bookmark (event id) to start fetching results from. If provided, `offset` and `limit` will start from the bookmark.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the found records.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: The approximate number of results
+                  results:
+                    description: The requested page of results
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/JSONRecord'
+    post:
+      summary: Create an event.
+      tags:
+      - Events
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreateRequest'
+      responses:
+        '200':
+          description: Returns the created record.
+          content:
+            application/json:
+              schema:
+                type: object
+components:
+  schemas:
+    EventCreateRequest:
+      type: object
+      properties:
+        recordId:
+          type: string
+          description: The record to get events for
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        type:
+          type: string
+          enum:
+          - create
+          - mutate
+          - internal
+          - widget-open
+          - widget-close
+        json:
+          type: object
+      required:
+      - recordId
+      - boardId
+      - type
+      - json
+    JSONRecord:
+      description: All records extend from this structure
+      type: object
+      properties:
+        id:
+          type: string
+          description: Globally unique identifier for this record
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true

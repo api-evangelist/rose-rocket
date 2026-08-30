@@ -1,0 +1,374 @@
+openapi: 3.2.0
+info:
+  title: Rose Rocket Platform Model Object Records API
+  version: 1.0.0
+  description: ''
+servers:
+- url: https://example-org.roserocket.com/api/v2/platformModel
+  description: Your organization's hostname with customized subdomain, e.g. "example-org".
+- url: https://roserocket.com/api/v2/platformModel
+  description: Generic hostname without a customized subdomain.
+tags:
+- name: Object Records
+paths:
+  /objects/{recordId}:
+    get:
+      summary: Returns a record by ID.
+      tags:
+      - Object Records
+      parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: paths
+        in: query
+        description: Comma separated list of period delimited paths denoting additional attributes to return. If omitted, only-top level primitive fields will be returned.
+        schema:
+          type: string
+      - name: boardId
+        in: query
+        description: The board ID that this request is relative to.
+        schema:
+          type: string
+      - name: isDetailView
+        in: query
+        description: If included, will add all fields that record's detail view confuration is dependent on.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the record with top-level primitive fields populated. See also the schema for the object requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+    put:
+      summary: Update a record.
+      tags:
+      - Object Records
+      parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectRecordUpdateRequest'
+      responses:
+        '200':
+          description: Returns the updated record with top-level primitive and nested updated fields populated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+    delete:
+      summary: Delete a record.
+      tags:
+      - Object Records
+      parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: boardId
+        in: query
+        description: The board ID that this request is relative to.
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Returns the deleted record with top-level primitive fields populated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+  /objects:
+    patch:
+      summary: Upsert a record by external id.
+      tags:
+      - Object Records
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectRecordUpsertRequest'
+      responses:
+        '200':
+          description: Returns the updated record with top-level primitive and nested updated fields populated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+        '201':
+          description: Returns the created record.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+    post:
+      summary: Create a record.
+      tags:
+      - Object Records
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectRecordCreateRequest'
+      responses:
+        '200':
+          description: Returns the created record with top-level primitive and nested created fields populated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+  /objects/{objectKey}/{externalId}/external:
+    patch:
+      summary: Upsert a record by object key and external id.
+      tags:
+      - Object Records
+      parameters:
+      - name: externalId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: objectKey
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectRecordUpsertRequest'
+      responses:
+        '200':
+          description: Returns the object record with top-level primitive fields populated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+    delete:
+      summary: Delete a record with type objectKey by externalId.
+      tags:
+      - Object Records
+      parameters:
+      - name: externalId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: objectKey
+        in: path
+        required: true
+        description: The type of the record. Determines which schema this is.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the deleted record with top-level primitive fields populated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+    get:
+      summary: Get a record with type objectKey by externalId.
+      tags:
+      - Object Records
+      parameters:
+      - name: externalId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: objectKey
+        in: path
+        required: true
+        description: The type of the record. Determines which schema this is.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns the object record with top-level primitive fields populated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+  /objects/bulk_delete:
+    post:
+      summary: Bulk delete records.
+      tags:
+      - Object Records
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectRecordBulkDeleteRequest'
+      responses:
+        '204':
+          description: The records have been successfully deleted
+  /objects/search:
+    post:
+      summary: List records.
+      tags:
+      - Object Records
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObjectRecordSearchRequest'
+      responses:
+        '200':
+          description: Returns the found records.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: number
+                    description: The approximate number of results
+                  results:
+                    description: The requested page of results
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/JSONRecord'
+  /objects/autocomplete:
+    get:
+      summary: Returns a list of records matching search term
+      tags:
+      - Object Records
+      parameters:
+      - name: objectKey
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: searchTerm
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: ids
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: labelPath
+        in: query
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Returns a list of records by object key for use in autocompletes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JSONRecord'
+components:
+  schemas:
+    ObjectRecordBulkDeleteRequest:
+      type: object
+      properties:
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        objectKey:
+          type: string
+          description: The type of the record.
+        ids:
+          description: The IDs of the records to be deleted
+          type: array
+          items:
+            type: string
+    ObjectRecordCreateRequest:
+      type: object
+      properties:
+        json:
+          type: object
+          description: Optional initial values
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+        paths:
+          type: array
+          description: Additional paths to return.
+    ObjectRecordUpdateRequest:
+      type: object
+      properties:
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        json:
+          type: object
+          description: The fields to update, included related records. Only fields to be changed should be provided.
+        paths:
+          type: array
+          description: Additional paths to return.
+        objectKey:
+          type: string
+          description: Object key of the record to update.
+      required:
+      - json
+      - objectKey
+    JSONRecord:
+      description: All records extend from this structure
+      type: object
+      properties:
+        id:
+          type: string
+          description: Globally unique identifier for this record
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+    ObjectRecordSearchRequest:
+      type: object
+      properties:
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        timezone:
+          type: string
+          description: Timezone of the caller.
+        filters:
+          type: array
+          description: The filters.
+        filtersOperator:
+          type: string
+        orderByPath:
+          type: string
+        orderByDirection:
+          type: string
+        limit:
+          type: number
+      required:
+      - boardId
+    ObjectRecordUpsertRequest:
+      type: object
+      properties:
+        json:
+          type: object
+          description: The fields to update or initialize
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+        paths:
+          type: array
+          description: Additional paths to return.
+      required:
+      - objectKey
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true

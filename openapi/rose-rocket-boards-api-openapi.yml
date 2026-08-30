@@ -1,0 +1,70 @@
+openapi: 3.2.0
+info:
+  title: Rose Rocket Platform Model Boards API
+  version: 1.0.0
+  description: ''
+servers:
+- url: https://example-org.roserocket.com/api/v2/platformModel
+  description: Your organization's hostname with customized subdomain, e.g. "example-org".
+- url: https://roserocket.com/api/v2/platformModel
+  description: Generic hostname without a customized subdomain.
+tags:
+- name: Boards
+paths:
+  /boards/nav:
+    get:
+      summary: List boards.
+      tags:
+      - Boards
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BoardFindNavItemsRequest'
+      responses:
+        '200':
+          description: Returns the found records.
+          content:
+            application/json:
+              schema:
+                description: The requested page of results
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: Use this is the "boardId" referenced in the object record service and elsewhere.
+                    name:
+                      type: string
+                    icon:
+                      type:
+                      - string
+                      - 'null'
+                    objectKey:
+                      type: string
+                    createdAt:
+                      type: string
+                    isExternal:
+                      type: boolean
+components:
+  schemas:
+    BoardFindNavItemsRequest:
+      type: object
+      properties:
+        orderBy:
+          type: object
+        orderByDirection:
+          type: string
+          enum:
+          - asc
+          - desc
+        objectKey:
+          type: string
+        offset:
+          type: number
+        limit:
+          type: number
+x-readme:
+  explorer-enabled: true
+  proxy-enabled: true
