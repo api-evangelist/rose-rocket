@@ -38,14 +38,14 @@ modified: '2026-08-26'
 tags:
   - Transportation
   - Logistics
-  - Freight
-  - Trucking
-  - Transportation Management System
+  - freight
+  - trucking
+  - transportation-management-system
   - Supply Chain
-  - Dispatch
-  - Webhooks
-  - OAuth
-  - Canada
+  - dispatch
+  - Webhook
+  - Authentication
+  - canada
 tags_raw:
   - transportation
   - logistics
@@ -98,6 +98,8 @@ apis:
   humanURL: https://roserocket.readme.io/reference
   baseURL: https://network.roserocket.com/api/v2/platformModel
   tags:
+  - Event
+  tags_raw:
   - Events
   properties:
   - type: OpenAPI
