@@ -13,7 +13,7 @@ tags:
 paths:
   /events:
     get:
-      summary: List events for a given record.
+      summary: List events for a given record
       tags:
       - Events
       parameters:
@@ -129,8 +129,10 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/JSONRecord'
+      operationId: getEvents
+      x-operation-id-source: derived
     post:
-      summary: Create an event.
+      summary: Create an event
       tags:
       - Events
       requestBody:
@@ -145,6 +147,8 @@ paths:
             application/json:
               schema:
                 type: object
+      operationId: postEvents
+      x-operation-id-source: derived
 components:
   schemas:
     EventCreateRequest:

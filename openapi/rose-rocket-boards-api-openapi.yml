@@ -13,7 +13,7 @@ tags:
 paths:
   /boards/nav:
     get:
-      summary: List boards.
+      summary: List boards
       tags:
       - Boards
       requestBody:
@@ -47,6 +47,8 @@ paths:
                       type: string
                     isExternal:
                       type: boolean
+      operationId: getBoardsNav
+      x-operation-id-source: derived
 components:
   schemas:
     BoardFindNavItemsRequest:

@@ -1,0 +1,30 @@
+{
+  "provider": "rose-rocket",
+  "sources": [
+    "_original/rose-rocket-platform-model-api.json"
+  ],
+  "outputs": [
+    "rose-rocket-boards-api-openapi.yml",
+    "rose-rocket-events-api-openapi.yml",
+    "rose-rocket-object-records-api-openapi.yml",
+    "rose-rocket-user-groups-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "rose-rocket-platform-model-api.json: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
+    "rose-rocket-platform-model-api.json: declared missing tag: Boards",
+    "rose-rocket-platform-model-api.json: declared missing tag: Events",
+    "rose-rocket-platform-model-api.json: declared missing tag: Object Records",
+    "rose-rocket-platform-model-api.json: declared missing tag: User Groups",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "rose-rocket-boards-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "rose-rocket-events-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "rose-rocket-object-records-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "rose-rocket-user-groups-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
+}

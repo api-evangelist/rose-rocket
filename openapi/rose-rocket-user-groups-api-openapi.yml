@@ -109,9 +109,7 @@ paths:
 
         **NOTE:** Removal takes prescendence over addition so if a user ID appears on both the `add` and `remove` collection,
 
-        then that user will *NOT* be a member of the user group after the operation completes.
-
-        '
+        then that user will *NOT* be a member of the user group after the operation completes.'
       operationId: addUserGroupMembers
       parameters:
       - $ref: '#/components/parameters/GroupId'
@@ -190,8 +188,56 @@ paths:
           $ref: '#/components/responses/GroupUnauthorized'
         '403':
           $ref: '#/components/responses/GroupForbiddenResponse'
+      operationId: postUserGroupsSearch
+      x-operation-id-source: derived
 components:
   responses:
+    GroupForbiddenResponse:
+      description: 'The action could not be performed on the indicated user group(s) because the caller does not have sufficient permission.
+
+        Users require the `userGroupResource` permission scope.
+
+        * Viewer-level permission is required for listing, fetching, and viewing membership of user groups.
+
+        * Editor-level permission is required for updating, deleting, and modifying membership of user groups.
+
+        '
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: number
+                example: 403
+              message:
+                type: string
+                example: Action is forbidden.
+              error:
+                type: string
+                example: Forbidden
+    GroupValidationError:
+      description: The new group could not be created because there was a problem validating the request body.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - statusCode
+            - message
+            - error
+            properties:
+              statusCode:
+                type: number
+                example: 400
+              message:
+                type: array
+                items:
+                  type: string
+                  example: name should not be empty
+              error:
+                type: string
+                example: Bad Request
     GroupNameConflict:
       description: The group could not be created or renamed because a group already exists with the name provided.
       content:
@@ -240,81 +286,7 @@ components:
               error:
                 type: string
                 example: Not Found
-    GroupForbiddenResponse:
-      description: 'The action could not be performed on the indicated user group(s) because the caller does not have sufficient permission.
-
-        Users require the `userGroupResource` permission scope.
-
-        * Viewer-level permission is required for listing, fetching, and viewing membership of user groups.
-
-        * Editor-level permission is required for updating, deleting, and modifying membership of user groups.
-
-        '
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              statusCode:
-                type: number
-                example: 403
-              message:
-                type: string
-                example: Action is forbidden.
-              error:
-                type: string
-                example: Forbidden
-    GroupValidationError:
-      description: The new group could not be created because there was a problem validating the request body.
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-            - statusCode
-            - message
-            - error
-            properties:
-              statusCode:
-                type: number
-                example: 400
-              message:
-                type: array
-                items:
-                  type: string
-                  example: name should not be empty
-              error:
-                type: string
-                example: Bad Request
   schemas:
-    CreateOrUpdateUserGroup:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          description: Name of the user group as it will appear in the UI.
-          example: Admins
-        description:
-          type: string
-          example: Has administrative access to the org
-          description: An optional text description of the user group.
-    SearchGroupsDTO:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of the user group(s).
-          example: Admins
-        ids:
-          type: array
-          items:
-            type: string
-        limit:
-          type: number
-        offset:
-          type: number
     UserGroup:
       type: object
       required:
@@ -335,6 +307,34 @@ components:
           description: The type of user group. (I.e. local, Active Directory, etc.)
           enum:
           - local
+        description:
+          type: string
+          example: Has administrative access to the org
+          description: An optional text description of the user group.
+    SearchGroupsDTO:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the user group(s).
+          example: Admins
+        ids:
+          type: array
+          items:
+            type: string
+        limit:
+          type: number
+        offset:
+          type: number
+    CreateOrUpdateUserGroup:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Name of the user group as it will appear in the UI.
+          example: Admins
         description:
           type: string
           example: Has administrative access to the org

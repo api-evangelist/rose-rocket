@@ -13,7 +13,7 @@ tags:
 paths:
   /objects/{recordId}:
     get:
-      summary: Returns a record by ID.
+      summary: Returns a record by ID
       tags:
       - Object Records
       parameters:
@@ -45,8 +45,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: getObjectsByRecordId
+      x-operation-id-source: derived
     put:
-      summary: Update a record.
+      summary: Update a record
       tags:
       - Object Records
       parameters:
@@ -68,8 +70,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: putObjectsByRecordId
+      x-operation-id-source: derived
     delete:
-      summary: Delete a record.
+      summary: Delete a record
       tags:
       - Object Records
       parameters:
@@ -92,9 +96,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: deleteObjectsByRecordId
+      x-operation-id-source: derived
   /objects:
     patch:
-      summary: Upsert a record by external id.
+      summary: Upsert a record by external id
       tags:
       - Object Records
       requestBody:
@@ -115,8 +121,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: patchObjects
+      x-operation-id-source: derived
     post:
-      summary: Create a record.
+      summary: Create a record
       tags:
       - Object Records
       requestBody:
@@ -131,9 +139,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: postObjects
+      x-operation-id-source: derived
   /objects/{objectKey}/{externalId}/external:
     patch:
-      summary: Upsert a record by object key and external id.
+      summary: Upsert a record by object key and external id
       tags:
       - Object Records
       parameters:
@@ -159,8 +169,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: patchObjectsByObjectKeyByExternalIdExternal
+      x-operation-id-source: derived
     delete:
-      summary: Delete a record with type objectKey by externalId.
+      summary: Delete a record with type objectKey by externalId
       tags:
       - Object Records
       parameters:
@@ -182,8 +194,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: deleteObjectsByObjectKeyByExternalIdExternal
+      x-operation-id-source: derived
     get:
-      summary: Get a record with type objectKey by externalId.
+      summary: Get a record with type objectKey by externalId
       tags:
       - Object Records
       parameters:
@@ -205,9 +219,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: getObjectsByObjectKeyByExternalIdExternal
+      x-operation-id-source: derived
   /objects/bulk_delete:
     post:
-      summary: Bulk delete records.
+      summary: Bulk delete records
       tags:
       - Object Records
       requestBody:
@@ -218,9 +234,11 @@ paths:
       responses:
         '204':
           description: The records have been successfully deleted
+      operationId: postObjectsBulkDelete
+      x-operation-id-source: derived
   /objects/search:
     post:
-      summary: List records.
+      summary: List records
       tags:
       - Object Records
       requestBody:
@@ -244,6 +262,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/JSONRecord'
+      operationId: postObjectsSearch
+      x-operation-id-source: derived
   /objects/autocomplete:
     get:
       summary: Returns a list of records matching search term
@@ -277,62 +297,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JSONRecord'
+      operationId: getObjectsAutocomplete
+      x-operation-id-source: derived
 components:
   schemas:
-    ObjectRecordBulkDeleteRequest:
-      type: object
-      properties:
-        boardId:
-          type: string
-          description: The board this record is being accessed through.
-        objectKey:
-          type: string
-          description: The type of the record.
-        ids:
-          description: The IDs of the records to be deleted
-          type: array
-          items:
-            type: string
-    ObjectRecordCreateRequest:
-      type: object
-      properties:
-        json:
-          type: object
-          description: Optional initial values
-        objectKey:
-          type: string
-          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
-        paths:
-          type: array
-          description: Additional paths to return.
-    ObjectRecordUpdateRequest:
-      type: object
-      properties:
-        boardId:
-          type: string
-          description: The board this record is being accessed through.
-        json:
-          type: object
-          description: The fields to update, included related records. Only fields to be changed should be provided.
-        paths:
-          type: array
-          description: Additional paths to return.
-        objectKey:
-          type: string
-          description: Object key of the record to update.
-      required:
-      - json
-      - objectKey
-    JSONRecord:
-      description: All records extend from this structure
-      type: object
-      properties:
-        id:
-          type: string
-          description: Globally unique identifier for this record
-        objectKey:
-          type: string
-          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
     ObjectRecordSearchRequest:
       type: object
       properties:
@@ -355,6 +323,50 @@ components:
           type: number
       required:
       - boardId
+    ObjectRecordBulkDeleteRequest:
+      type: object
+      properties:
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        objectKey:
+          type: string
+          description: The type of the record.
+        ids:
+          description: The IDs of the records to be deleted
+          type: array
+          items:
+            type: string
+    ObjectRecordUpdateRequest:
+      type: object
+      properties:
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        json:
+          type: object
+          description: The fields to update, included related records. Only fields to be changed should be provided.
+        paths:
+          type: array
+          description: Additional paths to return.
+        objectKey:
+          type: string
+          description: Object key of the record to update.
+      required:
+      - json
+      - objectKey
+    ObjectRecordCreateRequest:
+      type: object
+      properties:
+        json:
+          type: object
+          description: Optional initial values
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+        paths:
+          type: array
+          description: Additional paths to return.
     ObjectRecordUpsertRequest:
       type: object
       properties:
@@ -369,6 +381,16 @@ components:
           description: Additional paths to return.
       required:
       - objectKey
+    JSONRecord:
+      description: All records extend from this structure
+      type: object
+      properties:
+        id:
+          type: string
+          description: Globally unique identifier for this record
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
 x-readme:
   explorer-enabled: true
   proxy-enabled: true
