@@ -301,6 +301,44 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
+    ObjectRecordBulkDeleteRequest:
+      type: object
+      properties:
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        objectKey:
+          type: string
+          description: The type of the record.
+        ids:
+          description: The IDs of the records to be deleted
+          type: array
+          items:
+            type: string
+    JSONRecord:
+      description: All records extend from this structure
+      type: object
+      properties:
+        id:
+          type: string
+          description: Globally unique identifier for this record
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+    ObjectRecordUpsertRequest:
+      type: object
+      properties:
+        json:
+          type: object
+          description: The fields to update or initialize
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+        paths:
+          type: array
+          description: Additional paths to return.
+      required:
+      - objectKey
     ObjectRecordSearchRequest:
       type: object
       properties:
@@ -323,20 +361,6 @@ components:
           type: number
       required:
       - boardId
-    ObjectRecordBulkDeleteRequest:
-      type: object
-      properties:
-        boardId:
-          type: string
-          description: The board this record is being accessed through.
-        objectKey:
-          type: string
-          description: The type of the record.
-        ids:
-          description: The IDs of the records to be deleted
-          type: array
-          items:
-            type: string
     ObjectRecordUpdateRequest:
       type: object
       properties:
@@ -367,30 +391,6 @@ components:
         paths:
           type: array
           description: Additional paths to return.
-    ObjectRecordUpsertRequest:
-      type: object
-      properties:
-        json:
-          type: object
-          description: The fields to update or initialize
-        objectKey:
-          type: string
-          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
-        paths:
-          type: array
-          description: Additional paths to return.
-      required:
-      - objectKey
-    JSONRecord:
-      description: All records extend from this structure
-      type: object
-      properties:
-        id:
-          type: string
-          description: Globally unique identifier for this record
-        objectKey:
-          type: string
-          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
 x-readme:
   explorer-enabled: true
   proxy-enabled: true
