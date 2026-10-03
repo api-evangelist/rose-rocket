@@ -301,30 +301,6 @@ paths:
       x-operation-id-source: derived
 components:
   schemas:
-    ObjectRecordBulkDeleteRequest:
-      type: object
-      properties:
-        boardId:
-          type: string
-          description: The board this record is being accessed through.
-        objectKey:
-          type: string
-          description: The type of the record.
-        ids:
-          description: The IDs of the records to be deleted
-          type: array
-          items:
-            type: string
-    JSONRecord:
-      description: All records extend from this structure
-      type: object
-      properties:
-        id:
-          type: string
-          description: Globally unique identifier for this record
-        objectKey:
-          type: string
-          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
     ObjectRecordUpsertRequest:
       type: object
       properties:
@@ -338,6 +314,46 @@ components:
           type: array
           description: Additional paths to return.
       required:
+      - objectKey
+    JSONRecord:
+      description: All records extend from this structure
+      type: object
+      properties:
+        id:
+          type: string
+          description: Globally unique identifier for this record
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+    ObjectRecordCreateRequest:
+      type: object
+      properties:
+        json:
+          type: object
+          description: Optional initial values
+        objectKey:
+          type: string
+          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
+        paths:
+          type: array
+          description: Additional paths to return.
+    ObjectRecordUpdateRequest:
+      type: object
+      properties:
+        boardId:
+          type: string
+          description: The board this record is being accessed through.
+        json:
+          type: object
+          description: The fields to update, included related records. Only fields to be changed should be provided.
+        paths:
+          type: array
+          description: Additional paths to return.
+        objectKey:
+          type: string
+          description: Object key of the record to update.
+      required:
+      - json
       - objectKey
     ObjectRecordSearchRequest:
       type: object
@@ -361,36 +377,20 @@ components:
           type: number
       required:
       - boardId
-    ObjectRecordUpdateRequest:
+    ObjectRecordBulkDeleteRequest:
       type: object
       properties:
         boardId:
           type: string
           description: The board this record is being accessed through.
-        json:
-          type: object
-          description: The fields to update, included related records. Only fields to be changed should be provided.
-        paths:
-          type: array
-          description: Additional paths to return.
         objectKey:
           type: string
-          description: Object key of the record to update.
-      required:
-      - json
-      - objectKey
-    ObjectRecordCreateRequest:
-      type: object
-      properties:
-        json:
-          type: object
-          description: Optional initial values
-        objectKey:
-          type: string
-          description: The type of the record. Determines the other possible fields of this record and determines which schema this is.
-        paths:
+          description: The type of the record.
+        ids:
+          description: The IDs of the records to be deleted
           type: array
-          description: Additional paths to return.
+          items:
+            type: string
 x-readme:
   explorer-enabled: true
   proxy-enabled: true

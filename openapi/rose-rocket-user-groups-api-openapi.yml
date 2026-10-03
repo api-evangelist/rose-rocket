@@ -192,6 +192,44 @@ paths:
       x-operation-id-source: derived
 components:
   responses:
+    GroupNotFound:
+      description: The operation could not be completed because the requested groupId could not be found.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              statusCode:
+                type: number
+                example: 404
+              message:
+                type: string
+                example: User group with ID "XXXXX" not found.
+              error:
+                type: string
+                example: Not Found
+    GroupValidationError:
+      description: The new group could not be created because there was a problem validating the request body.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+            - statusCode
+            - message
+            - error
+            properties:
+              statusCode:
+                type: number
+                example: 400
+              message:
+                type: array
+                items:
+                  type: string
+                  example: name should not be empty
+              error:
+                type: string
+                example: Bad Request
     GroupForbiddenResponse:
       description: 'The action could not be performed on the indicated user group(s) because the caller does not have sufficient permission.
 
@@ -216,22 +254,6 @@ components:
               error:
                 type: string
                 example: Forbidden
-    GroupUnauthorized:
-      description: The action could not be completed because the call was not made with a valid JWT identifying the calling user or application.
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              statusCode:
-                type: number
-                example: 401
-              message:
-                type: string
-                example: Action is unauthorized.
-              error:
-                type: string
-                example: Unauthorized
     GroupNameConflict:
       description: The group could not be created or renamed because a group already exists with the name provided.
       content:
@@ -248,30 +270,8 @@ components:
               error:
                 type: string
                 example: Conflict
-    GroupValidationError:
-      description: The new group could not be created because there was a problem validating the request body.
-      content:
-        application/json:
-          schema:
-            type: object
-            required:
-            - statusCode
-            - message
-            - error
-            properties:
-              statusCode:
-                type: number
-                example: 400
-              message:
-                type: array
-                items:
-                  type: string
-                  example: name should not be empty
-              error:
-                type: string
-                example: Bad Request
-    GroupNotFound:
-      description: The operation could not be completed because the requested groupId could not be found.
+    GroupUnauthorized:
+      description: The action could not be completed because the call was not made with a valid JWT identifying the calling user or application.
       content:
         application/json:
           schema:
@@ -279,29 +279,27 @@ components:
             properties:
               statusCode:
                 type: number
-                example: 404
+                example: 401
               message:
                 type: string
-                example: User group with ID "XXXXX" not found.
+                example: Action is unauthorized.
               error:
                 type: string
-                example: Not Found
+                example: Unauthorized
   schemas:
-    SearchGroupsDTO:
+    CreateOrUpdateUserGroup:
       type: object
+      required:
+      - name
       properties:
         name:
           type: string
-          description: Name of the user group(s).
+          description: Name of the user group as it will appear in the UI.
           example: Admins
-        ids:
-          type: array
-          items:
-            type: string
-        limit:
-          type: number
-        offset:
-          type: number
+        description:
+          type: string
+          example: Has administrative access to the org
+          description: An optional text description of the user group.
     UserGroup:
       type: object
       required:
@@ -326,19 +324,21 @@ components:
           type: string
           example: Has administrative access to the org
           description: An optional text description of the user group.
-    CreateOrUpdateUserGroup:
+    SearchGroupsDTO:
       type: object
-      required:
-      - name
       properties:
         name:
           type: string
-          description: Name of the user group as it will appear in the UI.
+          description: Name of the user group(s).
           example: Admins
-        description:
-          type: string
-          example: Has administrative access to the org
-          description: An optional text description of the user group.
+        ids:
+          type: array
+          items:
+            type: string
+        limit:
+          type: number
+        offset:
+          type: number
   parameters:
     GroupId:
       name: groupId
