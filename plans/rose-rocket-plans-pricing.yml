@@ -94,3 +94,23 @@ comparison_claims:
     - {alternative: Generic Cloud TMS, stated_cost: $12K-$40K/month, stated_time_to_live: 6+ months}
     - {alternative: Enterprise ERP / custom build, stated_cost: $20K-$40K/month plus $150K-$500K implementation, stated_time_to_live: 12-24 months}
     - {alternative: Rose Rocket, stated_cost: Starting at $2080/month, stated_time_to_live: Guaranteed 90 days}
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - hybrid
+  - metered
+  units: []
+  plans:
+  - name: Full Service Platform
+    access: other
+    model: hybrid
+    model_how: derived
+    units: []
+    periods: []
+  - name: Enterprise
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
